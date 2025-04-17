@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
+use Database\Seeders\RolePermissionSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,11 +18,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Create an admin user
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('password'),
-            'user_slug' => Str::slug('Admin'), 
+        $this->call([
+            RolePermissionSeeder::class,
         ]);
     }
 }

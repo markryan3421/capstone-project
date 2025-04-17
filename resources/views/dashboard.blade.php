@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ sidebarOpen: false }">
+<html lang="en" x-data="{ sidebarOpen: false, itotOpen: false }">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,7 +24,6 @@
       100% { transform: translateY(0) rotate(360deg); opacity: 0.3; }
     }
 
-    /* Adding rotating circle elements */
     .rotating-circle {
       position: absolute;
       width: 40px;
@@ -42,7 +41,6 @@
       100% { transform: rotate(360deg); opacity: 0.3; }
     }
 
-    /* Wave and background */
     .wave {
       position: absolute;
       bottom: 0;
@@ -68,11 +66,27 @@
       100% { background-position: 50px 50px; }
     }
 
+    .sidebar {
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
+
+    .sidebar-link {
+      transition: background-color 0.3s ease, padding-left 0.3s ease;
+    }
+
+    .sidebar-link:hover {
+      background-color: #4b5563;
+      padding-left: 20px;
+    }
+
+    .sub-link {
+      transition: max-height 0.3s ease-out;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans relative overflow-hidden">
 
-  <!-- Particles Background -->
   <div id="tsparticles" class="fixed inset-0 z-0"></div>
 
   <!-- Floating shapes with delay -->
@@ -82,46 +96,48 @@
   <div class="floating-shape" style="top: 80%; left: 30%; animation-delay: 15s;"></div>
   <div class="floating-shape" style="top: 10%; left: 70%; animation-delay: 12s;"></div>
 
-  <!-- Rotating Circles -->
   <div class="rotating-circle" style="top: 10%; left: 20%;"></div>
   <div class="rotating-circle" style="top: 70%; left: 70%;"></div>
   <div class="rotating-circle" style="top: 40%; left: 30%;"></div>
   <div class="rotating-circle" style="top: 60%; left: 80%;"></div>
 
-  <!-- Wave Element -->
   <svg class="wave" viewBox="0 0 1440 320">
     <path fill="#1f2937" fill-opacity="1" d="M0,96L40,122.7C80,149,160,203,240,202.7C320,203,400,149,480,149.3C560,149,640,203,720,224C800,245,880,235,960,197.3C1040,160,1120,96,1200,96C1280,96,1360,160,1400,192L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path>
   </svg>
 
-  <!-- Sidebar Toggle -->
   <button class="fixed top-4 left-4 z-50 bg-blue-600 text-white px-3 py-2 rounded-full shadow-md" @click="sidebarOpen = true" x-show="!sidebarOpen">→</button>
   <button class="fixed top-4 left-4 z-50 bg-gray-800 text-white px-3 py-2 rounded-full shadow-md" @click="sidebarOpen = false" x-show="sidebarOpen" style="display: none;">←</button>
 
-  <!-- Main Layout -->
   <div class="flex transition-all duration-300 ease-in-out relative z-10" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
-
-    <!-- Sidebar -->
-    <aside class="fixed left-0 top-0 h-full w-64 bg-gray-800 p-6 shadow-xl z-40 transition-transform duration-300 ease-in-out" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+    <aside class="fixed left-0 top-0 h-full w-64 bg-gray-800 p-6 shadow-xl z-40 sidebar" :class="sidebarOpen ? 'transform translate-x-0 opacity-100' : 'transform -translate-x-full opacity-0'">
       <div class="flex flex-col items-center mb-6">
         <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-xl font-bold mb-2">A</div>
         <p class="text-sm font-semibold text-gray-300">Admin</p>
       </div>
       <nav class="space-y-2 text-gray-300 text-sm w-full">
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Itot</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Baylo</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Balut</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Suyop</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Ta</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Balas</a>
-        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">qwerty</a>
+        <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center justify-between" @click="itotOpen = !itotOpen">
+          <span>Itot</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="itotOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
+        <div x-show="itotOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
+          <a href="#" class="block px-4 py-2 rounded">Sub-link 1</a>
+          <a href="#" class="block px-4 py-2 rounded">Sub-link 2</a>
+        </div>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Baylo</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Balut</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Suyop</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Ta</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Balas</a>
+        <a href="/settings" class="sidebar-link block px-4 py-2 rounded">Settings</a>
         <form action="/logout" method="POST" class="block px-4 py-2 rounded hover:bg-gray-700">
             @csrf
             <button class="btn btn-sm btn-secondary">Sign Out</button>
         </form>
-      </nav>
+        </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 transition-all duration-300 ease-in-out px-4 pt-20 md:px-8 space-y-8 max-w-full">
       <div class="bg-gray-800 p-6 rounded-2xl shadow">
         <h1 class="text-2xl font-bold text-white">HOME</h1>
@@ -168,7 +184,6 @@
     </main>
   </div>
 
-  <!-- Particle Animation -->
   <script>
     tsParticles.load("tsparticles", {
       fullScreen: { enable: false },
