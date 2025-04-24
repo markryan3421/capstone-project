@@ -1,3 +1,0 @@
-<x-settings>
-  
-</x-settings>

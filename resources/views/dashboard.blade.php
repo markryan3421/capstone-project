@@ -116,7 +116,7 @@
       </div>
       <nav class="space-y-2 text-gray-300 text-sm w-full">
         <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center justify-between" @click="itotOpen = !itotOpen">
-          <span>Itot</span>
+          <span>Dashboard</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="itotOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
@@ -125,12 +125,12 @@
           <a href="#" class="block px-4 py-2 rounded">Sub-link 1</a>
           <a href="#" class="block px-4 py-2 rounded">Sub-link 2</a>
         </div>
-        <a href="#" class="sidebar-link block px-4 py-2 rounded">Baylo</a>
-        <a href="#" class="sidebar-link block px-4 py-2 rounded">Balut</a>
-        <a href="#" class="sidebar-link block px-4 py-2 rounded">Suyop</a>
-        <a href="#" class="sidebar-link block px-4 py-2 rounded">Ta</a>
-        <a href="#" class="sidebar-link block px-4 py-2 rounded">Balas</a>
-        <a href="/settings" class="sidebar-link block px-4 py-2 rounded">Settings</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Department Goal</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Long Term Goal</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Short Term Goal</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Phases</a>
+        <a href="#" class="sidebar-link block px-4 py-2 rounded">Reports</a>
+        <a href="/settings/users" class="sidebar-link block px-4 py-2 rounded">Settings</a>
         <form action="/logout" method="POST" class="block px-4 py-2 rounded hover:bg-gray-700">
             @csrf
             <button class="btn btn-sm btn-secondary">Sign Out</button>

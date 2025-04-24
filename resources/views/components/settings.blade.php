@@ -93,20 +93,23 @@
     }
   </style>
 </head>
-<body class="text-white relative overflow-hidden">
+<body class="text-white relative overflow-x-hidden">
 
   <!-- Particles Background -->
   <div id="particles-js"></div>
 
   <!-- Main Content -->
   <div class="container mx-auto p-8 relative z-10">
+  <a href="/" class="top-4 left-4 mb-3 underline underline-offset-8"><- Back to Menu</a>
+
     <h1 class="text-3xl font-semibold mb-6">Settings</h1>
 
     <div class="nav-container">
+
       <li class="list-none">
           <x-nav-link 
-              :href="route('settings.users')" 
-              :active="request()->routeIs('settings.users.*')"
+              :href="route('settings.users.index')" 
+              :active="request()->routeIs('users.*')"
               class="nav-link"
           >
               Users
@@ -114,8 +117,8 @@
       </li>
       <li class="list-none">
           <x-nav-link 
-              :href="route('settings.roles')" 
-              :active="request()->routeIs('settings.roles.*')"
+              :href="route('settings.roles.index')" 
+              :active="request()->routeIs('roles.*')"
               class="nav-link"
           >
               Roles
@@ -123,9 +126,10 @@
       </li>
     </div>
 
-    <div class="content-transition bg-gray-800 rounded-lg p-6 shadow-xl">
+    <div >
       {{ $slot }}
     </div>
+
   </div>
 
   {{-- JS CDN --}}
