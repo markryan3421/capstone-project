@@ -34,7 +34,7 @@ class LoginController extends Controller
 
     public function index() {
         if(Auth::check()) {
-            return view('dashboard')->with(['user' => Auth::user()]);
+            return view('homepage')->with(['user' => Auth::user()]);
         } else {
             return view('welcome');
         }

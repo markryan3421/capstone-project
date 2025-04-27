@@ -1,0 +1,46 @@
+models:
+  User:
+    relationships:
+      hasMany: ShortTermGoals:assigned_to, LongtermGoals:assigned_to, SDG:project_manager_id
+      belongsToMany: SDG:sdg_member
+
+  SDG:
+    title: string
+    description: text
+    project_manager_id: unsignedInteger
+    relationships:
+      hasMany: ShortTermGoals, LongtermGoals
+      belongsToMany: User:sdg_member
+      belongsTo: User:project_manager_id
+
+  SDGMember:
+    user_id: unsignedInteger
+    sdg_id: unsignedInteger
+    relationships:
+      belongsToMany: User, SDG
+
+  ShortTermGoals:
+    sdg_id: unsignedInteger
+    assigned_by: unsignedInteger
+    assigned_to: unsignedInteger
+    title: string
+    description: text
+    start_date: date
+    end_date: date
+    status: string
+    compliance_percentage: float
+    relationships:
+      belongsTo: SDG:sdg_id, User:assigned_by, User:assigned_to
+
+  LongtermGoals:
+    sdg_id: unsignedInteger
+    assigned_by: unsignedInteger
+    assigned_to: unsignedInteger
+    title: string
+    description: text
+    start_date: date
+    end_date: date
+    status: string
+    compliance_percentage: float
+    relationships:
+      belongsTo: SDG, User:assigned_by, User:assigned_to

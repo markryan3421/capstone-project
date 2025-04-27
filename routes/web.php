@@ -7,7 +7,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SettingsController;
 
 Route::get('/', [LoginController::class, 'index']);
-
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
@@ -32,5 +31,8 @@ Route::middleware('auth')->prefix('settings')->name('settings.')->group(function
   Route::put('/users/{user:user_slug}', [UserController::class, 'update']);
   Route::put('/users/{user:user_slug}/assign-role', [UserController::class, 'assignRole']);
   Route::delete('/users/{user:user_slug}/delete', [UserController::class, 'destroy']);
+});
 
+Route::get('/sdg/no-poverty', function() {
+  return view('sdg.1-NoPoverty.index');
 });
