@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sdg;
+use App\Models\Goal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +19,18 @@ class LoginController extends Controller
         if(Auth::attempt(['email' => $incomingFields['email'], 'password' => $incomingFields['password']])) {
             // Store cookies
             $request->session()->regenerate();
-            // event(new ExampleEvent(['username' => Auth::user()->username, 'action' => 'logged in']));
+            $user = Auth::user();
+
+             // If the user has no current_sdg_id yet, assign the first one they have
+            if (!$user->current_sdg_id && $user->sdgs()->exists()) {
+                $firstSdg = $user->sdgs()->first();
+                $user->current_sdg_id = $firstSdg->id;
+                $user->save();
+                // $user->update(['current_sdg_id' => $firstSdg->id]);
+            }
+
+            // Set the SDG ID into session
+            session(['sdg_id' => $user->current_sdg_id]);
 
             // Redirect back to homepage
             return redirect('/')->with(['success' => 'You are now logged in!']);
@@ -34,7 +47,12 @@ class LoginController extends Controller
 
     public function index() {
         if(Auth::check()) {
-            return view('homepage')->with(['user' => Auth::user()]);
+            $sdgs = Sdg::all();
+
+            // Fetch all goals with related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
+            $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->latest()->get();
+
+            return view('goals.index')->with(['user' => Auth::user(), 'sdgs' => $sdgs, 'goals' => $goals]);
         } else {
             return view('welcome');
         }

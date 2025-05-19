@@ -38,6 +38,25 @@
                                   required
                               >
                           </div>
+
+                          <!-- Sdg -->
+                          <div>
+                                @foreach($sdgs as $sdg)
+                                    <div class="flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            name="sdgs[]" 
+                                            value="{{ $sdg->id }}"
+                                            id="sdg-{{ $sdg->id }}"
+                                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                                            {{ in_array($sdg->id, $user->sdgs->pluck('id')->toArray()) ? 'checked' : '' }}
+                                        >
+                                        <label for="sdg-{{ $sdg->id }}" class="ml-2 text-sm text-gray-700">
+                                            SDG {{ $sdg->id }}: {{ $sdg->name }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                          </div>
   
                           <div class="flex justify-end pt-2">
                               <button type="submit" 

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SdgController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
@@ -33,6 +35,16 @@ Route::middleware('auth')->prefix('settings')->name('settings.')->group(function
   Route::delete('/users/{user:user_slug}/delete', [UserController::class, 'destroy']);
 });
 
-Route::get('/sdg/no-poverty', function() {
-  return view('sdg.1-NoPoverty.index');
+Route::middleware('auth')->group(function() {
+  Route::get('/sdgs/change/{tenantID}', [SdgController::class, 'changeSdg'])->name('sdgs.change');
+});
+
+Route::middleware('auth')->prefix('goals')->name('goals.')->group(function () {
+  Route::get('/create', [GoalController::class, 'create'])->name('create');
+
+  Route::post('/create', [GoalController::class, 'store'])->name('store');
+  Route::get('/show/{goal:slug}', [GoalController::class, 'show'])->name('goals.show');
+  Route::get('/edit/{goal:slug}', [GoalController::class, 'edit'])->name('edit');
+  Route::put('/update/{goal:slug}', [GoalController::class, 'update']);
+  Route::delete('/delete/{goal:slug}', [GoalController::class, 'destroy']);
 });

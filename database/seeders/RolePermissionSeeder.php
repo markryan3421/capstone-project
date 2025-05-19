@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Sdg;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
@@ -35,9 +36,12 @@ class RolePermissionSeeder extends Seeder
 
        // Create Roles
        $adminRole = Role::create(['name' => 'admin']);
+       Role::create(['name' => 'project-manager']);
+       Role::create(['name' => 'staff']);
 
        // Assign permissions to roles
        $adminRole->givePermissionTo(Permission::all()); // Admin gets all permissions
+       $allSdg = Sdg::all();
 
         // Create an admin user
         $adminUser = User::create([
@@ -45,8 +49,10 @@ class RolePermissionSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => bcrypt('password'),
             'user_slug' => Str::slug('Admin'),
+            // 'sdg_id' => 1,
         ]);
 
         $adminUser->assignRole($adminRole);
+        $adminUser->sdgs()->sync($allSdg->pluck('id')->toArray());
     }
 }

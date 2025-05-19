@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Str;
+use Database\Seeders\SdgSeeder;
 use Illuminate\Database\Seeder;
+use Database\Seeders\UserSeeder;
 use Database\Seeders\RolePermissionSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,11 +17,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+
+        $this->call([
+            SdgSeeder::class,
+        ]);
 
         // Create an admin user
         $this->call([
             RolePermissionSeeder::class,
         ]);
+
+        $this->call([
+            UserSeeder::class,
+        ]);
+
+        // User::factory(10)->create();
+
     }
 }

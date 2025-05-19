@@ -7,12 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/js/tom-select.complete.min.js"></script>
     <link rel="stylesheet" href="style.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans relative overflow-hidden">
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans relative">
 
-    <div id="tsparticles" class="fixed inset-0 z-0"></div>
+    <div id="tsparticles" class="fixed inset-0 z-0 pointer-events-none"></div>
 
     <div class="floating-shape" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
     <div class="floating-shape" style="top: 60%; left: 80%; animation-delay: 5s;"></div>
@@ -37,10 +39,10 @@
       :class="{'transform translate-x-0 opacity-100': sidebarOpen, 'transform -translate-x-full opacity-0': !sidebarOpen, 'sidebar-open': sidebarOpen}">
             <div class="flex flex-col items-center mb-6">
                 <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-xl font-bold mb-2">A</div>
-                <p class="text-sm font-semibold text-gray-300">Admin</p>
+                <p class="text-sm font-semibold text-gray-300">{{ Auth::user()->name }}</p>
             </div>
             <nav>
-                <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                <a href="/" class="sidebar-link px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h4l3-3m0 0l3 3h4m-6-3v12" />
                     </svg>
@@ -61,7 +63,7 @@
                     </a>
 
                     <div x-show="itotOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
-                        <a href="departmentgoallist.html  " class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                        <a href="departmentgoallist.html" class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
@@ -71,7 +73,7 @@
                 </div>
 
                 <div x-data="{ longTermOpen: false }">
-                    <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="longTermOpen = !longTermOpen">
+                    <div class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="longTermOpen = !longTermOpen">
                         <span class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" />
@@ -81,16 +83,16 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="longTermOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
-                    </a>
+                    </div>
 
                     <div x-show="longTermOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
-                        <a href="longtermgoalform.html" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                        <a href="/goals/create" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Add New
                         </a>
-                        <a href="longtermgoallist.html" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                        <a href="#" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
@@ -184,36 +186,36 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
           </button>
-
-          <!-- Department Sublinks -->
-          <div x-show="openDepartments" x-transition class="ml-4 space-y-2 mt-1">
-              <a href="#" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-                  <!-- New Department Icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                  No Poverty
-              </a>
-              <a href="#" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-                  <!-- Department List Icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10" />
-                  </svg>
-                  Zero Hunger 
-              </a>
-          </div>
         </div>
  
 
         <a href="/settings/users" class="sidebar-link block px-4 py-2 rounded">Settings</a>
         <form action="/logout" method="POST" class="block px-4 py-2 rounded hover:bg-gray-700">
             @csrf
+
+
             <button class="btn btn-sm btn-secondary">Sign Out</button>
         </form>
       </nav>
     </aside>
 
-    <main class="flex-1 transition-all duration-300 ease-in-out px-4 pt-20 md:px-8 space-y-8 max-w-full">      
+    <main class="flex-1 transition-all duration-300 ease-in-out px-4 pt-20 md:px-8 space-y-8 max-w-full overflow-y-auto h-[calc(100vh-5rem)]">    
+      <!-- Success Message -->
+      @if(session('success'))
+      <div class="bg-green-900 border-l-4 border-green-500 text-green-100 p-4 mb-6" role="alert">
+        <p>{{ session('success') }}</p>
+      </div>
+      @endif
+
+      @if ($errors->any())
+          <div class="bg-red-500 text-white p-4 rounded-md mb-4">
+              <ul class="list-disc pl-5 space-y-1">
+                  @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                  @endforeach
+              </ul>
+          </div>
+      @endif
       {{ $slot }}
     </main>
   </div>
