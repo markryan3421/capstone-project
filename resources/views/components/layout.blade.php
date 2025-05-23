@@ -6,14 +6,18 @@
     <title>Botleg Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/js/tom-select.complete.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans relative">
-
+    
     <div id="tsparticles" class="fixed inset-0 z-0 pointer-events-none"></div>
 
     <div class="floating-shape" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
@@ -216,7 +220,9 @@
               </ul>
           </div>
       @endif
-      {{ $slot }}
+      <div x-data="{ showTaskModal: false }" class="{{ $attributes->get('class') }}">
+        {{ $slot }}
+      </div>
     </main>
   </div>
 

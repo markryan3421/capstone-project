@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sdg;
 use App\Models\Goal;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -15,13 +16,16 @@ class GoalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Goal $goal)
     {
+        
         // Fetch all goals with related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
         $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->latest()->get();
 
+        $goal = Goal::with(['tasks.taskProductivities.user'])->findOrFail($goal->id);
+
         // Return the index view and pass the $goals data
-        return view('goals.index', compact('goals'));
+        return view('goals.index', compact('goals', 'goal'));
     }
 
     /**
@@ -80,7 +84,7 @@ class GoalController extends Controller
             'project_manager_id' => Auth::id(),
             'sdg_id' => $incomingFields['sdg_id'],
             'title' => $incomingFields['title'],
-            'slug' => Str::slug($incomingFields['slug']),
+            'slug' => Str::slug($incomingFields['title']),
             'description' => $incomingFields['description'],
             'type' => $incomingFields['type'],
             'start_date' => $incomingFields['start_date'],
@@ -103,9 +107,15 @@ class GoalController extends Controller
      * Display the specified resource.
      */
     public function show(Goal $goal)
-    {
+    {   
         // Fetch the goal by ID and load its related project manager, assigned users, and SDG
-        $goal = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->findOrFail($goal->id);
+        // $goal = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->findOrFail($goal->id);
+        $goal->load([
+            'projectManager',
+            'assignedUsers',
+            'sdg',
+            'tasks.taskProductivities.user', // Load the user for each task's taskProductivity
+        ]);
 
         return view('goals.show', compact('goal'));
     }

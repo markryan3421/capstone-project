@@ -47,14 +47,16 @@
                 <label for="start_date" class="block text-sm font-medium mb-1">Start Date</label>
                 <input type="date" name="start_date" id="start_date"
                        class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                       min="{{ date('Y-m-d') }}" required>
+                       min="{{ now()->format('Y-m-d') }}"  
+                       required>
             </div>
 
             <div>
                 <label for="end_date" class="block text-sm font-medium mb-1">End Date</label>
                 <input type="date" name="end_date" id="end_date"
                        class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                       min="{{ date('Y-m-d') }}" required>
+                       min="{{ now()->format('Y-m-d') }}"  
+                       required>
             </div>
         </div>
 
