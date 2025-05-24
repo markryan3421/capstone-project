@@ -21,9 +21,9 @@ class TaskProductivityController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Task $task)
     {
-        //
+        return view('tasks.submit-task', compact('task'));
     }
 
     /**
@@ -70,7 +70,7 @@ class TaskProductivityController extends Controller
             'remarks' => 'Pending for review',
         ], $fileData));
 
-        return back()->with('success', 'Task submitted successfully.');
+        return redirect('/')->with('success', 'Task submitted successfully.');
     }
 
     /**

@@ -63,5 +63,6 @@ Route::middleware('auth')->prefix('goals/{goal:slug}/tasks')->name('tasks.')->gr
 
 // Task Productivity Related Routes
 Route::middleware('auth')->group(function() {
-  Route::post('tasks/{task:slug}/submit', [TaskProductivityController::class, 'store'])->name('tasks.submit');
+  Route::get('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'create'])->name('tasks.create');
+  Route::post('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'store'])->name('tasks.submit');
 });

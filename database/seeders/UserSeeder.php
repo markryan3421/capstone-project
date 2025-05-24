@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'), // default password
                 'remember_token' => Str::random(10),
+                'current_sdg_id' => $i,
             ]);
 
             $user->assignRole('project-manager');

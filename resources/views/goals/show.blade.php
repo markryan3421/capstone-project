@@ -188,17 +188,15 @@
                     </div>
                   </div>
                   <div class="flex space-x-2 ml-4">
-                    @hasanyrole('staff|admin|project-manager')
-                      <button 
-                        @click="openSubmitModal('{{ $task->slug }}', '{{ $task->title }}')"
-                        class="flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-md text-white text-sm transition-colors duration-200"
-                      >
+                      <a href="/tasks/{{ $task->slug }}/submit" 
+                        class="flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md text-white text-sm transition-colors duration-200"
+                        >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Submit
-                      </button>
-                    @endhasanyrole
+                      </a>
+                    
                   </div>
                 </div>
 
@@ -353,127 +351,5 @@
       </div>
     </div>
 
-    <!-- Task Submission Modal -->
-    <div 
-      x-show="showSubmitModal" 
-      x-transition:enter="ease-out duration-300"
-      x-transition:enter-start="opacity-0"
-      x-transition:enter-end="opacity-100"
-      x-transition:leave="ease-in duration-200"
-      x-transition:leave-start="opacity-100"
-      x-transition:leave-end="opacity-0"
-      class="fixed inset-0 z-50 overflow-y-auto" 
-      x-cloak
-      >
-      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="closeSubmitModal()"></div>
-
-        <!-- Modal panel -->
-        <div class="inline-block align-bottom bg-gray-800 rounded-xl shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="px-6 py-5 sm:p-6">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between mb-5">
-              <h3 class="text-xl font-semibold text-white" x-text="'Submit: ' + currentTaskTitle"></h3>
-              <button @click="closeSubmitModal()" class="text-gray-400 hover:text-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Form -->
-            <form method="POST" action="{{ route('tasks.submit', $task->slug) }}" enctype="multipart/form-data" class="space-y-5">
-              @csrf
-              
-              <!-- Subject Field -->
-              <div>
-                <label for="subject" class="block text-sm font-medium text-gray-300 mb-2">Subject *</label>
-                <input 
-                  type="text" 
-                  name="subject" 
-                  id="subject" 
-                  required
-                  placeholder="What is this submission about?"
-                  class="w-full bg-gray-700 border border-gray-600 text-white px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                >
-              </div>
-
-              <!-- Date Field -->
-              <div>
-                <label for="date" class="block text-sm font-medium text-gray-300 mb-2">Submission Date</label>
-                <input 
-                  type="text" 
-                  name="date" 
-                  id="date" 
-                  value="{{ now()->format('Y-m-d') }}" 
-                  disabled
-                  class="w-full bg-gray-700 border border-gray-600 text-gray-300 px-4 py-3 rounded-lg cursor-not-allowed"
-                >
-              </div>
-
-              <!-- Comments Field -->
-              <div>
-                <label for="comments" class="block text-sm font-medium text-gray-300 mb-2">Comments</label>
-                <textarea 
-                  name="comments" 
-                  id="comments" 
-                  rows="4" 
-                  placeholder="Add any additional notes..."
-                  class="w-full bg-gray-700 border border-gray-600 text-white px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                ></textarea>
-              </div>
-
-              <!-- File Upload -->
-              <div>
-                <label for="file" class="block text-sm font-medium text-gray-300 mb-2">Attach File *</label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-700 border-dashed rounded-lg">
-                  <div class="space-y-1 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <div class="flex text-sm text-gray-400">
-                      <label for="file" class="relative cursor-pointer bg-gray-800 rounded-md font-medium text-blue-400 hover:text-blue-300 focus-within:outline-none">
-                        <span>Upload a file</span>
-                        <input 
-                          id="file" 
-                          name="file" 
-                          type="file" 
-                          required
-                          accept=".doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx"
-                          class="sr-only"
-                        >
-                      </label>
-                      <p class="pl-1">or drag and drop</p>
-                    </div>
-                    <p class="text-xs text-gray-500">DOC, DOCX, PDF, XLS, PPT up to 10MB</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Form Actions -->
-              <div class="flex justify-end space-x-3 pt-4">
-                <button 
-                  type="button" 
-                  @click="closeSubmitModal()" 
-                  class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors duration-200 flex items-center"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Submit Task
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </x-layout>

@@ -15,6 +15,9 @@ class SdgController extends Controller
         // Change Tenant
         Auth::user()->update(['current_sdg_id' => $tenant->id]);
 
+        // Update Tenant in Session
+        session(['sdg_id' => $tenant->id]);
+
         // Redirect
         return redirect('/')->with(['success' => 'Tenant changed successfully!']);
     }

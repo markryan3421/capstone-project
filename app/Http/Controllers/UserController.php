@@ -37,7 +37,7 @@ class UserController extends Controller
         ]);
     
         // Get the current SDG/tenant ID stored in session (set during login)
-        $tenantId = session('tenant_id');
+        $tenantId = session('sdg_id');
     
         // Determine which SDG from the request belongs to the current session tenant
         // If a match is found, use it as the current SDG. Otherwise, this will be null.
@@ -53,7 +53,7 @@ class UserController extends Controller
             'email' => $incomingFields['email'],
             'password' => Hash::make($incomingFields['password']),
             'user_slug' => Str::slug($incomingFields['name']),
-            'current_sdg_id' => Auth::id(), // May be null if tenant ID not in selected SDGs
+            'current_sdg_id' => $currentSdgId, // May be null if tenant ID not in selected SDGs
         ]);
     
         // Assign the selected role to the user
