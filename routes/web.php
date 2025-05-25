@@ -61,8 +61,16 @@ Route::middleware('auth')->prefix('goals/{goal:slug}/tasks')->name('tasks.')->gr
   // Route::delete('/delete/{task:slug}', [GoalController::class, 'destroyTask']);
 });
 
-// Task Productivity Related Routes
+// Task Submission Related Routes
 Route::middleware('auth')->group(function() {
   Route::get('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'create'])->name('tasks.create');
-  Route::post('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'store'])->name('tasks.submit');
+  Route::post('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'submit'])->name('tasks.submit');
+});
+
+// Validate Task Submitted
+Route::middleware('auth')->group(function() {
+  Route::post('/submissions/{submission:id}/approve', [TaskProductivityController::class, 'approve'])->name('submissions.approve');
+  Route::post('/submissions/{submission:id}/reject', [TaskProductivityController::class, 'reject'])->name('submissions.reject');
+  Route::get('/submissions/{submission:id}/resubmit', [TaskProductivityController::class, 'resubmitForm'])->name('submissions.resubmit');
+  Route::put('/submissions/{productivity:id}/resubmit', [TaskProductivityController::class, 'resubmit'])->name('submissions.resubmit');
 });

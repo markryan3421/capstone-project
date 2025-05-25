@@ -22,7 +22,6 @@ class Task extends Model
         'slug',
         'description',
         'status',
-        'approval_status',
         'remarks',
         'deadline',
     ];

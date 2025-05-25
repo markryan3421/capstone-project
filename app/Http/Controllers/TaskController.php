@@ -6,9 +6,12 @@ use App\Models\Goal;
 use App\Models\Task;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Traits\GoalProgressUpdater;
 
 class TaskController extends Controller
 {
+    use GoalProgressUpdater;
+
     /**
      * Display a listing of the resource.
      */
@@ -46,6 +49,9 @@ class TaskController extends Controller
             'status' => $incomingFields['status'],
             'deadline' => $incomingFields['deadline'],
         ]);
+
+        $goal = $task->goal;
+        $this->updateGoalProgress($goal);
 
         return back()->with('success', 'Task created successfully.');
     }
@@ -88,6 +94,9 @@ class TaskController extends Controller
             'status' => $incomingFields['status'],
             'deadline' => $incomingFields['deadline'],
         ]);
+
+        $goal = $task->goal;
+        $this->updateGoalProgress($goal);
 
         return redirect("/goals/show/{$goal->slug}")->with('success', 'Task updated successfully.');
     }

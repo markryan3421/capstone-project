@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->longText('description')->nullable();
             $table->string('status')->default('pending'); // pending/in-progress/completed
-            $table->string('approval_status')->default('pending'); // pending/approved/rejected
             $table->text('remarks')->nullable();
             // $table->date('deadline');
             $table->timestamps();
