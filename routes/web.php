@@ -46,10 +46,13 @@ Route::middleware('auth')->group(function() {
 Route::middleware('auth')->prefix('goals')->name('goals.')->group(function () {
   Route::get('/create', [GoalController::class, 'create'])->name('create');
   Route::post('/create', [GoalController::class, 'store'])->name('store');
-  Route::get('/show/{goal:slug}', [GoalController::class, 'show'])->name('goals.show');
+  Route::get('/show/{goal:slug}', [GoalController::class, 'show'])->name('show');
   Route::get('/edit/{goal:slug}', [GoalController::class, 'edit'])->name('edit');
   Route::put('/update/{goal:slug}', [GoalController::class, 'update']);
   Route::delete('/delete/{goal:slug}', [GoalController::class, 'destroy']);
+
+  Route::get('/longterm', [GoalController::class, 'viewLongTermGoals'])->name('longterm');
+  Route::get('/shortterm', [GoalController::class, 'viewShortTermGoals'])->name('shortterm');
 });
 
 // Task Related Routes
@@ -65,6 +68,7 @@ Route::middleware('auth')->prefix('goals/{goal:slug}/tasks')->name('tasks.')->gr
 Route::middleware('auth')->group(function() {
   Route::get('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'create'])->name('tasks.create');
   Route::post('/tasks/{task:slug}/submit', [TaskProductivityController::class, 'submit'])->name('tasks.submit');
+  Route::get('/tasks/all', [TaskController::class, 'allTask'])->name('tasks.all');
 });
 
 // Validate Task Submitted
@@ -73,4 +77,10 @@ Route::middleware('auth')->group(function() {
   Route::post('/submissions/{submission:id}/reject', [TaskProductivityController::class, 'reject'])->name('submissions.reject');
   Route::get('/submissions/{submission:id}/resubmit', [TaskProductivityController::class, 'resubmitForm'])->name('submissions.resubmit');
   Route::put('/submissions/{productivity:id}/resubmit', [TaskProductivityController::class, 'resubmit'])->name('submissions.resubmit');
+});
+
+// Report Routes
+Route::middleware('auth')->group(function() {
+  Route::get('/reports/compliance', [GoalController::class, 'complianceReport'])->name('reports.compliance');
+  Route::get('/reports/non-compliance', [GoalController::class, 'nonComplianceReport'])->name('reports.non-compliance');
 });

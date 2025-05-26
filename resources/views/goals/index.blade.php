@@ -159,7 +159,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
             <div>
-                <div class="text-3xl font-bold text-white">{{ $shortTermGoalsCount ?? 0 }}</div>
+                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'short')->count() }}</div>
                 <div class="text-sm text-blue-200">Total Short Term Goals</div>
             </div>
             <div class="p-3 rounded-full bg-blue-700 bg-opacity-50">
@@ -170,7 +170,7 @@
         </div>
         <div class="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
             <div>
-                <div class="text-3xl font-bold text-white">{{ $longTermGoalsCount ?? 0 }}</div>
+                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'long')->count() }}</div>
                 <div class="text-sm text-purple-200">Total Long Term Goals</div>
             </div>
             <div class="p-3 rounded-full bg-purple-700 bg-opacity-50">

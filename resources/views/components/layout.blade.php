@@ -54,87 +54,47 @@
                 </a>
 
                 <div x-data="{ itotOpen: false }">
-                    <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="itotOpen = !itotOpen">
+                    <button class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="itotOpen = !itotOpen">
                         <span class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v18m0 0h13l-4-8 4-8H5z" />
                             </svg>
-                            Department Goal
+                            Goals
                         </span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="itotOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
-                    </a>
+                    </button>
 
                     <div x-show="itotOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
-                        <a href="departmentgoallist.html" class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                        <a href="{{ route('goals.create') }}" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Add New
+                        </a>
+                    
+                        <a href="{{ route('goals.longterm') }}" class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            List
+                            Long Term
                         </a>
                     </div>
-                </div>
 
-                <div x-data="{ longTermOpen: false }">
-                    <div class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="longTermOpen = !longTermOpen">
-                        <span class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" />
-                            </svg>
-                            Long Term Goal
-                        </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="longTermOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-
-                    <div x-show="longTermOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
-                        <a href="/goals/create" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Add New
-                        </a>
-                        <a href="#" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div x-show="itotOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
+                        <a href="{{ route('goals.shortterm') }}" class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
-                            List
+                            Short Term
                         </a>
                     </div>
                 </div>
+
+                
       
-      <div x-data="{ shortTermOpen: false }">
-        <a href="#" class="sidebar-link px-4 py-2 rounded flex items-center justify-between hover:bg-gray-700 transition-colors duration-200" @click="shortTermOpen = !shortTermOpen">
-          <span class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Short Term Goal
-          </span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 transform transition-transform duration-300 ease-in-out" :class="shortTermOpen ? 'rotate-180' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </a>
-      
-        <div x-show="shortTermOpen" x-transition:enter="transition-all ease-out duration-300" x-transition:leave="transition-all ease-in duration-300" class="sub-link pl-8">
-          <a href="shorttermgoalform.html" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add New
-          </a>
-          <a href="shorttermgoallist.html" class=" px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-            List
-          </a>
-        </div>
-      </div>
-      
-        <a href="phases.html" class="sidebar-link px-4 py-2 rounded flex items-center gap-2">
+        <a href="{{ route('tasks.all') }}" class="sidebar-link px-4 py-2 rounded flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
           </svg>
@@ -158,14 +118,14 @@
 
           <!-- Dropdown Menu -->
           <div x-show="openReports" x-transition class="ml-4 space-y-2 mt-1">
-              <a href="listofcompliance.html" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+              <a href="{{ route('reports.compliance') }}" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                   <!-- Compliance Icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4 -4m2 -2a9 9 0 11-18 0a9 9 0 0118 0z" />
                   </svg>
                   List of Compliance
               </a>
-              <a href="listofnoncompliance.html" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
+              <a href="{{ route('reports.non-compliance') }}" class="px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
                   <!-- Non-Compliance Icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M12 2a10 10 0 100 20a10 10 0 000-20z" />
@@ -175,30 +135,21 @@
           </div>
         </div>
 
+        <a href="/settings/users" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+            Settings
+        </a>
 
-                <!-- Alpine wrapper for Departments -->
-        <div x-data="{ openDepartments: false }">
-          <!-- Departments Main Link -->
-          <button @click="openDepartments = !openDepartments" class="w-full text-left sidebar-link px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200">
-              <!-- Department Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21V5a2 2 0 012-2h2a2 2 0 012 2v16m6 0V10a2 2 0 012-2h2a2 2 0 012 2v11M12 21V10" />
-              </svg>
-              Sustainable Development Goals 
-              <!-- Dropdown arrow -->
-              <svg xmlns="http://www.w3.org/2000/svg" :class="{'rotate-180': openDepartments}" class="h-4 w-4 ml-auto text-white transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-          </button>
-        </div>
- 
-
-        <a href="/settings/users" class="sidebar-link block px-4 py-2 rounded">Settings</a>
-        <form action="/logout" method="POST" class="block px-4 py-2 rounded hover:bg-gray-700">
+        <form action="/logout" method="POST" class="w-full">
             @csrf
-
-
-            <button class="btn btn-sm btn-secondary">Sign Out</button>
+            <button type="submit" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                </svg>
+                Sign Out
+            </button>
         </form>
       </nav>
     </aside>

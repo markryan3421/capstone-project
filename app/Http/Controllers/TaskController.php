@@ -12,6 +12,12 @@ class TaskController extends Controller
 {
     use GoalProgressUpdater;
 
+    public function allTask() {
+        $goalsWithTasks = Goal::with('tasks')->latest()->get();
+
+        return view('tasks.all-tasks', compact('goalsWithTasks'));
+    }
+
     /**
      * Display a listing of the resource.
      */

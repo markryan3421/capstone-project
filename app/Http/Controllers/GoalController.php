@@ -13,6 +13,41 @@ use Illuminate\Support\Facades\Auth;
 
 class GoalController extends Controller
 {
+    public function nonComplianceReport() {
+        $nonCompliantGoals = Goal::where('compliance_percentage', '<', 100)
+            ->with(['projectManager', 'assignedUsers', 'sdg'])
+            ->latest()
+            ->get();
+
+        return view('reports.non-compliance', compact('nonCompliantGoals'));
+    }
+    public function complianceReport() {
+        $compliantGoals = Goal::where('compliance_percentage', 100)
+            ->with(['projectManager', 'assignedUsers', 'sdg'])
+            ->latest()
+            ->get();
+
+        return view('reports.compliance', compact('compliantGoals'));
+    }
+
+    public function viewShortTermGoals() {
+        $shortTermGoals = Goal::where('type', 'short')
+            ->with(['projectManager', 'assignedUsers', 'sdg'])
+            ->latest()
+            ->get();
+
+        return view('goals.short-term', compact('shortTermGoals'));
+    }
+
+    public function viewLongTermGoals() {
+        $longTermGoals = Goal::where('type', 'long')
+            ->with(['projectManager', 'assignedUsers', 'sdg'])
+            ->latest()
+            ->get();
+
+        return view('goals.long-term', compact('longTermGoals'));
+    }
+
     /**
      * Display a listing of the resource.
      */
