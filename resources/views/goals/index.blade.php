@@ -1,4 +1,4 @@
-<x-layout class="bg-gray-900 text-white">
+<x-layout class="bg-gray-900 text-white min-h-screen">
     <!-- SDG Dropdown Header -->
     <div class="bg-gray-800 p-6 rounded-2xl shadow-lg relative" x-data="{ open: false }">
         <button 
@@ -61,6 +61,64 @@
                         Sign Out
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
+            <div>
+                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'short')->count() }}</div>
+                <div class="text-sm text-blue-200">Total Short Term Goals</div>
+            </div>
+            <div class="p-3 rounded-full bg-blue-700 bg-opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
+            <div>
+                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'long')->count() }}</div>
+                <div class="text-sm text-purple-200">Total Long Term Goals</div>
+            </div>
+            <div class="p-3 rounded-full bg-purple-700 bg-opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+        <!-- Compliance Chart - 75% width -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg lg:col-span-3" width="500px" height="100%">
+            <div class="flex justify-between items-center mb-6"> <!-- Increased mb-4 to mb-6 -->
+                <h3 class="text-xl font-semibold text-white">Compliance Overview</h3>
+                <div class="flex space-x-4">
+                    <span class="flex items-center text-sm text-gray-400">
+                        <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Total
+                    </span>
+                    <span class="flex items-center text-sm text-gray-400">
+                        <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span> Compliant
+                    </span>
+                    <span class="flex items-center text-sm text-gray-400">
+                        <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span> Non-Compliant
+                    </span>
+                </div>
+            </div>
+            <div> <!-- Increased height from h-80 to h-[400px] -->
+                <canvas id="complianceChart" width="400" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Goals Distribution Chart - 25% width -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg lg:col-span-1">
+            <h3 class="text-xl font-semibold text-white mb-8">Goals Distribution</h3> <!-- Increased mb-6 to mb-8 -->
+            <div width="400" height="500"> <!-- Increased height from h-80 to h-[400px] -->
+                <canvas id="distributionChart"></canvas>
             </div>
         </div>
     </div>
@@ -155,29 +213,140 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
-            <div>
-                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'short')->count() }}</div>
-                <div class="text-sm text-blue-200">Total Short Term Goals</div>
-            </div>
-            <div class="p-3 rounded-full bg-blue-700 bg-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-            </div>
-        </div>
-        <div class="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
-            <div>
-                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'long')->count() }}</div>
-                <div class="text-sm text-purple-200">Total Long Term Goals</div>
-            </div>
-            <div class="p-3 rounded-full bg-purple-700 bg-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Compliance Chart with adjusted spacing
+        const complianceCtx = document.getElementById('complianceChart').getContext('2d');
+        const complianceChart = new Chart(complianceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Goals', 'Compliant', 'Non-Compliant'],
+                datasets: [{
+                    label: 'Count',
+                    data: [{{ $totalGoals }}, {{ $compliantGoals }}, {{ $nonCompliantGoals }}],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(239, 68, 68, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(239, 68, 68, 1)'
+                    ],
+                    borderWidth: 1,
+                    barPercentage: 0.6, // Makes bars wider
+                    categoryPercentage: 0.8 // Adds more space between categories
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 },
+                        titleColor: 'rgb(209, 213, 219)',
+                        bodyColor: 'rgb(209, 213, 219)',
+                        borderColor: 'rgba(75, 85, 99, 1)',
+                        borderWidth: 1,
+                        padding: 16,
+                        usePointStyle: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(75, 85, 99, 0.5)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgb(156, 163, 175)',
+                            font: { size: 12 },
+                            padding: 10 // Added y-axis tick padding
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgb(156, 163, 175)',
+                            font: { size: 12 },
+                            padding: 10 // Added x-axis tick padding
+                        }
+                    }
+                }
+            }
+        });
+
+        // Distribution Chart with adjusted spacing
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        const distributionChart = new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Short Term', 'Long Term'],
+                datasets: [{
+                    data: [{{ $goals->where('type', 'short')->count() }}, {{ $goals->where('type', 'long')->count() }}],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: 'rgb(209, 213, 219)',
+                            font: { size: 12 },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 },
+                        titleColor: 'rgb(209, 213, 219)',
+                        bodyColor: 'rgb(209, 213, 219)',
+                        borderColor: 'rgba(75, 85, 99, 1)',
+                        borderWidth: 1,
+                        padding: 16,
+                        usePointStyle: true
+                    }
+                },
+                cutout: '60%', // Reduced from 65% to make pie thicker
+                spacing: 10 // Added spacing between elements
+            }
+        });
+    </script>
 </x-layout>
