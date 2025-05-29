@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Settings</title>
 
-  
-
   {{-- Tailwind CSS CDN --}}
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
 
@@ -30,14 +28,6 @@
         margin-bottom: 2rem;
         border-bottom: 1px solid #374151;
         padding-bottom: 1rem;
-      display: flex;
-      gap: 2.5rem;
-      justify-content: center;
-      text-align: center;
-      
-      margin-bottom: 2rem;
-      border-bottom: 1px solid #374151;
-      padding-bottom: 1rem;
     }
 
     .nav-container a {
@@ -61,7 +51,7 @@
         left: 0;
         background: #3b82f6;
         transform-origin: bottom right;
-        transition: transform 0.3s ease-out;  /* Changed from 0.5s to 0.3s */
+        transition: transform 0.3s ease-out;
     }
 
     .nav-container a:hover span::after,
@@ -78,7 +68,6 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    
   </style>
 </head>
 <body class="text-white relative overflow-x-hidden">
@@ -88,14 +77,7 @@
 
   <!-- Sidebar code from layout.blade.php here -->
   <div class="container mx-auto p-8 relative z-10">
-  <a href="/" class="top-4 left-4 mb-3 underline underline-offset-8"><- Back to Menu</a>
-  <!-- Main Content -->
-  <div class="container  mx-auto p-8 relative z-10 ">
-    <button 
-        class="fixed top-4 left-4 z-50 bg-blue-600 text-white px-3 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors duration-200" 
-        onclick="window.location.href='/'">
-        ←
-    </button>
+    <a href="/" class="top-4 left-4 mb-3 underline underline-offset-8"><- Back to Menu</a>
 
     <h1 class="text-3xl font-semibold mb-6 mt-12">Settings</h1>
 
@@ -114,33 +96,11 @@
                 <span>Roles</span>
             </a>
         </li>
-
-      <li class="list-none">
-          <x-nav-link 
-              :href="route('settings.users.index')" 
-              :active="request()->routeIs('users.*')"
-              class="nav-link "
-          >
-              Users
-          </x-nav-link>
-      </li>
-      <li class="list-none">
-          <x-nav-link 
-              :href="route('settings.roles.index')" 
-              :active="request()->routeIs('roles.*')"
-              class="nav-link"
-          >
-              Roles
-          </x-nav-link>
-      </li>
     </div>
 
-    
-        <div class="bg-white-800 p-6 rounded-2xl  mt-6 overflow-x-auto">
-            {{ $slot }}
-        </div>
-    
-
+    <div class="bg-white-800 p-6 rounded-2xl mt-6 overflow-x-auto">
+        {{ $slot }}
+    </div>
   </div>
 
   {{-- JS CDN --}}
