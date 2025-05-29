@@ -14,7 +14,6 @@
                                 name="name" 
                                 id="name"
                                 value="{{ old('name') }}"
-                                class="block w-full px-4 py-3 text-white bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 class="block w-full px-4 py-3 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter username"
                                 required
@@ -32,7 +31,6 @@
                                 name="email" 
                                 id="email"
                                 value="{{ old('email') }}"
-                                class="block w-full px-4 py-3 text-white bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 class="block w-full px-4 py-3 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter email"
                                 required
@@ -46,7 +44,6 @@
                         <div class="mt-4">
                             <x-input-label for="password" :value="__('Password')" class="block mb-2 text-sm font-medium text-gray-200" />
                             <x-text-input id="password" 
-                                class="block w-full px-4 py-3 text-white bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 class="block w-full px-4 py-3 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 type="password"
                                 name="password"
@@ -59,7 +56,6 @@
                         <div class="mt-4">
                             <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="block mb-2 text-sm font-medium text-gray-200" />
                             <x-text-input id="password_confirmation" 
-                                class="block w-full px-4 py-3 text-white bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 class="block w-full px-4 py-3 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 type="password"
                                 name="password_confirmation" 
@@ -118,7 +114,6 @@
                         </div>
                     
                         <div class="flex justify-end space-x-4 pt-6">
-                            <a href="/settings/users" class="me-2 inline-flex items-center px-3 py-2 border border-gray-600 text-sm font-medium rounded-lg shadow-sm text-gray-200 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                             <a href="/users" class="me-2 inline-flex items-center px-3 py-2 border border-gray-600 text-sm font-medium rounded-lg shadow-sm text-gray-200 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                                 Cancel
                             </a>
