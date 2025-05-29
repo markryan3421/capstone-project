@@ -30,6 +30,14 @@
         margin-bottom: 2rem;
         border-bottom: 1px solid #374151;
         padding-bottom: 1rem;
+      display: flex;
+      gap: 2.5rem;
+      justify-content: center;
+      text-align: center;
+      
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #374151;
+      padding-bottom: 1rem;
     }
 
     .nav-container a {
@@ -70,6 +78,7 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
+    
   </style>
 </head>
 <body class="text-white relative overflow-x-hidden">
@@ -80,8 +89,15 @@
   <!-- Sidebar code from layout.blade.php here -->
   <div class="container mx-auto p-8 relative z-10">
   <a href="/" class="top-4 left-4 mb-3 underline underline-offset-8"><- Back to Menu</a>
+  <!-- Main Content -->
+  <div class="container  mx-auto p-8 relative z-10 ">
+    <button 
+        class="fixed top-4 left-4 z-50 bg-blue-600 text-white px-3 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors duration-200" 
+        onclick="window.location.href='/'">
+        ←
+    </button>
 
-    <h1 class="text-3xl font-semibold mb-6">Settings</h1>
+    <h1 class="text-3xl font-semibold mb-6 mt-12">Settings</h1>
 
     <div class="nav-container">
         <li class="list-none">
@@ -98,11 +114,32 @@
                 <span>Roles</span>
             </a>
         </li>
+
+      <li class="list-none">
+          <x-nav-link 
+              :href="route('settings.users.index')" 
+              :active="request()->routeIs('users.*')"
+              class="nav-link "
+          >
+              Users
+          </x-nav-link>
+      </li>
+      <li class="list-none">
+          <x-nav-link 
+              :href="route('settings.roles.index')" 
+              :active="request()->routeIs('roles.*')"
+              class="nav-link"
+          >
+              Roles
+          </x-nav-link>
+      </li>
     </div>
 
-    <div >
-      {{ $slot }}
-    </div>
+    
+        <div class="bg-white-800 p-6 rounded-2xl  mt-6 overflow-x-auto">
+            {{ $slot }}
+        </div>
+    
 
   </div>
 

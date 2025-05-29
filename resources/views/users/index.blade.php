@@ -26,6 +26,7 @@
                             <table class="min-w-full divide-y bg-gray-700 divide-gray-600 divide-[1px]">
                                 <caption class="sr-only">Users List</caption>
                                 <thead class="white bg-gray-700">
+                                <thead class="bg-gray-700">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
