@@ -2,13 +2,13 @@
       <div class="py-12">
           <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
               <div class="flex items-center justify-between mb-6">
-                  <h1 class="text-3xl font-bold text-gray-900">Users Management</h1>
+                  <h1 class="text-3xl font-bold text-white">Users Management</h1>
                       <a href="/settings/users/create-user" class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                           Create New User
                       </a>
               </div>
   
-              <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+              <div class="overflow-hidden bg-gray-800 shadow-sm sm:rounded-lg">
                   <div class="p-6 text-gray-900">
                       @if(session('success'))
                           <div class="relative px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded" role="alert">
@@ -22,27 +22,28 @@
                           </div>
                       @endif
 
-                        <div class="overflow-x-auto rounded-lg border border-gray-100">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                        <div class="overflow-x-auto rounded-lg border border-gray-700">
+                            <table class="min-w-full divide-y bg-gray-700 divide-gray-600 divide-[1px]">
+                                <caption class="sr-only">Users List</caption>
+                                <thead class="white bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Role</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Actions</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-100">
+                                <tbody class="bg-gray-800 text-gray-100 divide-y divide-gray-600 divide-[1px]">
                                     @foreach($users as $user)
-                                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                    <tr class="hover:bg-gray-900 transition-colors duration-150">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                <a href="/settings/users/{{$user->user_slug}}" class="text-nuetral-600 hover:text-indigo-900">
+                                            <div class="text-sm font-medium">
+                                                <a href="/settings/users/{{$user->user_slug}}" class="text-white hover:text-indigo-400">
                                                     {{ $user->name }}
                                                 </a>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $user->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ $user->email }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($user->roles->isNotEmpty())
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -81,7 +82,7 @@
                             </table>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4 [&>div]:text-white [&>p]:text-white">
                             {{ $users->links() }}
                         </div>
                   </div>

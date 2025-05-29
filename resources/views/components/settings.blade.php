@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Settings</title>
 
-  @vite(['resources/css/settings.css', 'resources/js/settings.js'])
+  
 
   {{-- Tailwind CSS CDN --}}
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
@@ -13,83 +13,62 @@
   {{-- Inline Styles --}}
   <style>
     #particles-js {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -10;
-      background-color: #0f172a;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -10;
+        background-color: #0f172a;
     }
     
-    /* Navigation container */
     .nav-container {
-      display: flex;
-      gap: 2.5rem;
-      justify-content: center;
-      text-align: center;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid #374151;
-      padding-bottom: 1rem;
+        display: flex;
+        gap: 2.5rem;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #374151;
+        padding-bottom: 1rem;
     }
-    
-    /* Base nav link style */
-    .nav-link {
-      position: relative;
-      padding: 0.5rem 0;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #93c5fd; /* blue-300 */
-      transition: all 0.3s ease;
+
+    .nav-container a {
+        display: inline-block;
+        position: relative;
     }
-    
-    /* Hover state */
-    .nav-link:hover {
-      color: #bfdbfe; /* blue-200 */
+
+    .nav-container span {
+        position: relative;
+        display: inline-block;
+        padding-bottom: 2px;
     }
-    
-    /* ACTIVE STATE STYLES */
-    .nav-link.active {
-      color: #3b82f6; /* blue-500 - brighter for active */
-      font-weight: 700;
+
+    .nav-container span::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        transform: scaleX(0);
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background: #3b82f6;
+        transform-origin: bottom right;
+        transition: transform 0.3s ease-out;  /* Changed from 0.5s to 0.3s */
     }
-    
-    /* Animated underline - shows only for active */
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: -1rem;
-      left: 0;
-      width: 0;
-      height: 3px;
-      background: #3b82f6; /* blue-500 */
-      border-radius: 3px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .nav-container a:hover span::after,
+    .nav-container a.active span::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
     }
-    
-    .nav-link.active::after {
-      width: 100%;
-    }
-    
-    /* Pulse animation for active tab */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    .nav-link.active {
-      animation: pulse 0.5s ease;
-    }
-    
-    /* Content transition */
+
     .content-transition {
-      animation: fadeIn 0.4s ease-out;
+        animation: fadeIn 0.4s ease-out;
     }
     
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -98,32 +77,27 @@
   <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <!-- Main Content -->
+  <!-- Sidebar code from layout.blade.php here -->
   <div class="container mx-auto p-8 relative z-10">
   <a href="/" class="top-4 left-4 mb-3 underline underline-offset-8"><- Back to Menu</a>
 
     <h1 class="text-3xl font-semibold mb-6">Settings</h1>
 
     <div class="nav-container">
-
-      <li class="list-none">
-          <x-nav-link 
-              :href="route('settings.users.index')" 
-              :active="request()->routeIs('users.*')"
-              class="nav-link"
-          >
-              Users
-          </x-nav-link>
-      </li>
-      <li class="list-none">
-          <x-nav-link 
-              :href="route('settings.roles.index')" 
-              :active="request()->routeIs('roles.*')"
-              class="nav-link"
-          >
-              Roles
-          </x-nav-link>
-      </li>
+        <li class="list-none">
+            <a href="{{ route('settings.users.index') }}" 
+              class="text-blue-400 hover:text-blue-500 text-lg {{ request()->routeIs('settings.users.*') ? 'active' : '' }}"
+            >
+                <span>Users</span>
+            </a>
+        </li>
+        <li class="list-none">
+            <a href="{{ route('settings.roles.index') }}" 
+              class="text-blue-400 hover:text-blue-500 text-lg {{ request()->routeIs('settings.roles.*') ? 'active' : '' }}"
+            >
+                <span>Roles</span>
+            </a>
+        </li>
     </div>
 
     <div >
