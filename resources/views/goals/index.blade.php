@@ -6,7 +6,7 @@
             class="flex items-center justify-between w-full text-left group"
         >
             <div>
-                <h1 class="text-2xl font-bold text-white">SDG #{{ Auth::user()->sdg->id }} - {{ Auth::user()->sdg->name }}</h1>
+                <h1 class="text-2xl font-bold text-white"> {{ Auth::user()->sdg->name }}</h1>
                 <p class="text-gray-400 mt-1">Click to switch SDGs</p>
             </div>
             <svg 
@@ -42,7 +42,7 @@
                             :class="{ 'bg-gray-600': {{ Auth::user()->current_sdg_id == $sdg->id ? 'true' : 'false' }} }"
                         >
                             <span class="{{ Auth::user()->current_sdg_id == $sdg->id ? 'font-bold text-blue-400' : 'text-white' }}">
-                                SDG #{{ $sdg->id }} - {{ $sdg->name }}
+                                {{ $sdg->id }} - {{ $sdg->name }}
                             </span>
                             @if(Auth::user()->current_sdg_id == $sdg->id)
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">

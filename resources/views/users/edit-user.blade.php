@@ -39,6 +39,12 @@
                         </div>
 
                         <!-- Sdg -->
+                                  
+                            <div>
+                            <div>
+                                Sustainable Development Goals:    
+                            </div>
+
                         <div>
                             @foreach($sdgs as $sdg)
                                 <div class="flex items-center">
@@ -51,6 +57,7 @@
                                         {{ in_array($sdg->id, $user->sdgs->pluck('id')->toArray()) ? 'checked' : '' }}
                                     >
                                     <label for="sdg-{{ $sdg->id }}" class="ml-2 text-sm text-gray-200">
+                                       {{ $sdg->name }}
                                         SDG {{ $sdg->id }}: {{ $sdg->name }}
                                     </label>
                                 </div>
@@ -87,6 +94,8 @@
                             </select>
                         </div>
 
+                        <div class="flex justify-end pt-2 gap-4">
+                            <a href="/settings/users" class="inline-flex items-center px-3 py-2 border border-gray-600 text-sm font-medium rounded-lg shadow-sm text-gray-200 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                         <div class="flex justify-end pt-2">
                             <a href="/users" class="me-2 inline-flex items-center px-3 py-2 border border-gray-600 text-sm font-medium rounded-lg shadow-sm text-gray-200 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                                 Cancel
