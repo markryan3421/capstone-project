@@ -41,8 +41,6 @@ class TaskController extends Controller
     {
         $incomingFields = $request->validate([
             'title' => 'required|max:255',
-            'description' => 'required',
-            'status' => 'required|in:pending,in-progress,completed',
             'deadline' => 'required|date|after_or_equal:today',
         ]);
 
@@ -51,8 +49,7 @@ class TaskController extends Controller
             'sdg_id' => $goal->sdg_id,
             'slug' => Str::slug($incomingFields['title']),
             'title' => $incomingFields['title'],
-            'description' => $incomingFields['description'],
-            'status' => $incomingFields['status'],
+            'status' => 'pending',
             'deadline' => $incomingFields['deadline'],
         ]);
 

@@ -443,15 +443,6 @@
 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label for="task-status" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
-                    <select name="status" id="task-status" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="pending">Pending</option>
-                      <option value="in-progress">In Progress</option>
-                      <option value="completed">Completed</option>
-                    </select>
-                  </div>
-                  
-                  <div>
                     <label for="task-due-date" class="block text-sm font-medium text-gray-300 mb-1">Due Date</label>
                     <input 
                       type="date" 

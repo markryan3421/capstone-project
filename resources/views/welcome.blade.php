@@ -56,7 +56,7 @@
           <!-- Transparent Logo with Particle Background Visible -->
           <div class="relative w-52 h-52 mb-8">
             <div class="particle-overlay"></div>
-            <img src="{{ asset('images/logo.png') }}" alt="SDG Logo" 
+            <img src="{{ asset('images/logo1.png') }}" alt="SDG Logo" 
                  class="w-full h-full object-contain floating-logo opacity-90">
           </div>
           

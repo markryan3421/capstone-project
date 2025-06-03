@@ -97,7 +97,6 @@ class GoalController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'type' => 'required|in:short,long',
-            'status' => 'required|in:pending,in-progress,completed',
             'assigned_users.*' => [
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
@@ -124,7 +123,7 @@ class GoalController extends Controller
             'type' => $incomingFields['type'],
             'start_date' => $incomingFields['start_date'],
             'end_date' => $incomingFields['end_date'],
-            'status' => $incomingFields['status'],
+            'status' => 'pending',
         ]);
 
         if ($request->has('assigned_users')) {

@@ -70,24 +70,6 @@
         <!-- Status and Type -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label for="status" class="block text-sm font-medium mb-2 text-gray-300">Status</label>
-                <div class="relative">
-                    <select name="status" id="status"
-                            class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none transition duration-200 pr-10" 
-                            required>
-                        <option value="pending" class="bg-gray-800">Pending</option>
-                        <option value="in-progress" class="bg-gray-800">In Progress</option>
-                        <option value="completed" class="bg-gray-800">Completed</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
                 <label for="type" class="block text-sm font-medium mb-2 text-gray-300">Goal Type</label>
                 <div class="relative">
                     <select name="type" id="type"
