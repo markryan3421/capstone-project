@@ -6,8 +6,9 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/vite": "^4.0.0",
-        "axios": "^1.8.2",
+        "axios": "^1.6.8",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.2.0",
         "tailwindcss": "^4.0.0",
@@ -16,6 +17,12 @@
     "dependencies": {
         "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/inertia-vue3": "^0.6.0",
-        "chart.js": "^4.4.9"
+        "chart.js": "^4.4.9",
+        "dropzone": "^6.0.0-beta.2",
+        "preline": "^3.0.1",
+        "vanilla-calendar-pro": "^3.0.4"
+    },
+    "overrides": {
+        "axios": "^1.6.8"
     }
 }

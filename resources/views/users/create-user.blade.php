@@ -5,8 +5,20 @@
                 <div class="p-6 text-gray-200">
                     <h1 class="mb-8 text-2xl font-bold text-white">Create New User</h1>
 
-                    <form method="POST" action="/settings/users/create-user" class="space-y-6">
+                    <form method="POST" action="/settings/users/create-user" enctype="multipart/form-data" class="dropzone space-y-6" id="image-upload">
                         @csrf
+
+                        <!-- Avatar Input -->
+                        <div class="grid sm:grid-cols-12 gap-2 sm:gap-6">
+                            <div class="sm:col-span-9">
+                                <div class="flex items-center gap-5">
+                                    <img class="inline-block size-16 rounded-full ring-2 ring-white dark:ring-neutral-900" src="https://preline.co/assets/img/160x160/img1.jpg" alt="Avatar">
+                                    <div class="flex gap-x-2">
+                                        <input type="file" name="avatar" id="avatar" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Name Input -->
                         <div class="mb-6">
@@ -128,4 +140,12 @@
             </div>
         </div>
     </div>
+    <!-- Dropzone -->
+   <script type="text/javascript">
+    let dropzone = new Dropzone('#image-upload', {
+      thumbnailWidth: 200,
+      maxFilesize: 1,
+      acceptedFiles: ".jpeg,.jpg,.png",
+    })
+   </script>
 </x-settings>

@@ -27,9 +27,13 @@
                     <div class="bg-gray-50 rounded-lg p-8 shadow mb-10">
                         <div class="flex items-center space-x-6 mb-6">
                             <div class="flex-shrink-0">
-                                <div class="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-3xl font-bold">
-                                    {{ substr($user->name, 0, 1) }}
-                                </div>
+                                @if($user->avatar)
+                                    <img src="{{ asset('storage/avatars/' . $user->avatar) }}" alt="avatar">
+                                @else
+                                    <span class="text-4xl font-bold text-white">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </span>
+                                @endif
                             </div>
                             <div>
                                 <h1 class="text-2xl font-bold text-gray-800">{{ $user->name }}</h1>
@@ -43,7 +47,7 @@
                                 <h3 class="text-lg font-semibold text-gray-700 mb-4">Basic Information</h3>
                                 <div class="space-y-4 text-sm text-gray-700">
                                     <div>
-                                        <p class="text-gray-500">Username</p>
+                                        <p class="text-gray-500">Name</p>
                                         <p class="font-medium">{{ $user->name ?? 'N/A' }}</p>
                                     </div>
                                     <div>

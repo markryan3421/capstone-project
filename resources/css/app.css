@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import "../../node_modules/preline/variants.css";
+/* @source "../../node_modules/preline/dist/*.js"; */
 
 body {
     background-color: #0f172a;

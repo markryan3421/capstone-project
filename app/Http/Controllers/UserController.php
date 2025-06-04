@@ -9,14 +9,27 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+// use Intervention\Image\Facades\Image;
+
 
 class UserController extends Controller
 {
     public function index() {
-        $users = User::with('roles')->paginate(10);
-        $roles = Role::all();
+        $sdgs = Sdg::all();
+        $user = Auth::user();
 
-        return view('users.index', compact('users', 'roles'));
+        // Fetch the SDG based on the user's current_sdg_id
+        $sdg = Sdg::find($user->current_sdg_id);
+
+        // Fetch users assigned to the same SDG (e.g., other staff)
+        $staffUsers = User::where('current_sdg_id', '=', $user->current_sdg_id)
+            ->where('id', '!=', Auth::id()) // Exclude the current user
+            ->role(['staff', 'project-manager'])
+            ->get();
+
+        return view('users.index', compact('staffUsers', 'sdg', 'sdgs'));
     }
 
     public function create() {
@@ -28,6 +41,7 @@ class UserController extends Controller
     public function store(Request $request) {
         // Validate the incoming form data
         $incomingFields = $request->validate([
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:3000', // Optional avatar image
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed'],
@@ -46,9 +60,21 @@ class UserController extends Controller
                 return $sdgId == $tenantId;
             })
             ->first();
+
+        $filename = null;
+        // Check if avatar image is uploaded
+        if ($request->hasFile('avatar')) {
+            $filename = uniqid() . '.jpg';
+            $img = Image::make($request->file('avatar'))->fit(120)->encode('jpg');
+            Storage::disk('public')->put('avatars/' . $filename, $img);
+        }
+
+        // Retrive old avatar from database
+        $oldAvatar = Auth::user()->avatar ?? null;
     
         // Create the user with basic info and set the current_sdg_id if matched
         $user = User::create([
+            'avatar' => $filename ?? 'default-avatar.jpg', // Store the avatar filename
             'name' => $incomingFields['name'],
             'email' => $incomingFields['email'],
             'password' => Hash::make($incomingFields['password']),
@@ -61,6 +87,13 @@ class UserController extends Controller
     
         // Attach selected SDGs (tenants) to user via pivot table 'sdg_user'
         $user->sdgs()->sync($request->sdgs);
+
+        $user->save();
+
+        // Corrected file deletion logic
+        if ($oldAvatar && $oldAvatar !== 'default-avatar.jpg') {
+            Storage::disk('public')->delete('avatars/' . basename($oldAvatar));
+        }
     
         // Redirect to user settings page with success message
         return redirect('/settings/users')->with('success', 'User created successfully!');
@@ -79,28 +112,46 @@ class UserController extends Controller
         return view('users.edit-user', compact('roles', 'sdgs', 'user'));
     }
 
-    public function update(Request $request, User $user) {
+    public function update(Request $request, User $user)
+    {
         $incomingFields = $request->validate([
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:3000',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'sdgs' => 'sometimes|array',  // 'sometimes' makes it optional
-            'sdgs.*' => 'exists:sdgs,id' // Validate each SDG ID exists
+            'sdgs' => 'sometimes|array',
+            'sdgs.*' => 'exists:sdgs,id'
         ]);
 
         $incomingFields['user_slug'] = Str::slug($incomingFields['name']);
 
+        $oldAvatar = $user->avatar;
+
+        if ($request->hasFile('avatar')) {
+            $filename = uniqid() . '.jpg';
+            $img = Image::make($request->file('avatar'))->fit(120)->encode('jpg');
+            Storage::disk('public')->put('avatars/' . $filename, $img);
+
+            $user->avatar = $filename;
+
+            if ($oldAvatar && $oldAvatar !== 'default-avatar.jpg') {
+                Storage::disk('public')->delete('avatars/' . basename($oldAvatar));
+            }
+
+            // Prevent avatar from being overwritten by update() if null
+            unset($incomingFields['avatar']);
+        }
+
         $user->update($incomingFields);
 
-        // Sync SDGs - will detach missing and attach new ones
         if ($request->has('sdgs')) {
             $user->sdgs()->sync($request->sdgs);
         } else {
-            // If no SDGs submitted, detach all
             $user->sdgs()->detach();
         }
 
         return redirect('/settings/users')->with('success', 'User updated successfully!');
     }
+
 
     public function assignRole(Request $request, User $user) {
         // Validate that the role exists in the roles table

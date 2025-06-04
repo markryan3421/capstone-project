@@ -53,8 +53,7 @@ class GoalController extends Controller
      */
     public function index(Goal $goal)
     {
-        
-        // Fetch all goals with related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
+        // Fetch all goals and its related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
         $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->latest()->get();
 
         $goal = Goal::with(['tasks.taskProductivities.user'])->findOrFail($goal->id);
@@ -66,7 +65,7 @@ class GoalController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
         $sdgs = Sdg::all();
         $user = Auth::user();
@@ -98,6 +97,7 @@ class GoalController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'type' => 'required|in:short,long',
             'assigned_users.*' => [
+                'nullable',
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
                     $user = User::find($value);
@@ -189,6 +189,7 @@ class GoalController extends Controller
             'type' => 'required|in:short,long',
             'status' => 'required|in:pending,in-progress,completed',
             'assigned_users.*' => [
+                'nullable',
                 'exists:users,id',
                 function($attribute, $value, $fail) {
                     $user = User::find($value);

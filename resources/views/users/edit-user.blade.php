@@ -7,11 +7,23 @@
 
             <!-- User Info Form -->
             <div class="p-6 bg-gray-800 shadow sm:rounded-lg">
-                <form action="/settings/users/{{ $user->user_slug }}" method="POST">
+                <form action="/settings/users/{{ $user->user_slug }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="space-y-4">
-                        <h3 class="text-lg font-medium text-white">User Information</h3>
+                        <h3 class="text-lg font-medium text-white">Update User Information</h3>
+
+                        <!-- Avatar Input -->
+                        <div class="grid sm:grid-cols-12 gap-2 sm:gap-6">
+                            <div class="sm:col-span-9">
+                                <div class="flex items-center gap-5">
+                                    <img class="inline-block size-16 rounded-full ring-2 ring-white dark:ring-neutral-900" src="https://preline.co/assets/img/160x160/img1.jpg" alt="Avatar">
+                                    <div class="flex gap-x-2">
+                                        <input type="file" name="avatar" id="avatar" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Name Input -->
                         <div>

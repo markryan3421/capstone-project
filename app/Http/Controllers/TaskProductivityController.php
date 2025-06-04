@@ -44,7 +44,7 @@ class TaskProductivityController extends Controller
             'subject' => $request->subject,
             'comments' => $request->comments,
             'status' => 'pending',             // Reset the status
-            'remarks' => 'Pending for review',                 // Clear the previous rejection remarks
+            'remarks' => 'Pending for review', // Clear the previous rejection remarks
             'date' => now()->toDateString(),   // Update the date of resubmission
         ], $fileData));                        // Merge file data if any
 

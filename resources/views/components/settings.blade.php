@@ -158,19 +158,37 @@
             </span>
           </a>
         </li>
-        <li>
-          <a href="{{ route('settings.roles.index') }}" 
-            class="nav-tab {{ request()->routeIs('settings.roles.*') ? 'active' : '' }}"
-            aria-current="{{ request()->routeIs('settings.roles.*') ? 'page' : 'false' }}"
-          >
-            <span>
-              <i class="fas fa-user-shield"></i>
-              Role Permissions
-            </span>
-          </a>
-        </li>
+        @hasrole('admin')
+          <li>
+            <a href="{{ route('settings.roles.index') }}" 
+              class="nav-tab {{ request()->routeIs('settings.roles.*') ? 'active' : '' }}"
+              aria-current="{{ request()->routeIs('settings.roles.*') ? 'page' : 'false' }}"
+            >
+              <span>
+                <i class="fas fa-user-shield"></i>
+                Role Permissions
+              </span>
+            </a>
+          </li>
+        @endhasrole
       </ul>
     </nav>
+
+    @if (session()->has('failure'))
+    <div class="container container--narrow">
+      <div class="alert alert-danger text-center">
+        {{session('failure')}}
+      </div>
+    </div>
+    @endif
+
+    @if (session()->has('success'))
+    <div class="container container--narrow">
+      <div class="alert alert-success text-center">
+        {{session('success')}}
+      </div>
+    </div>
+    @endif
 
     <!-- Dynamic Content Area -->
     <main class="content-transition glass-card rounded-2xl p-6 md:p-8">
@@ -188,6 +206,14 @@
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="{{ asset('js/settings.js') }}" defer></script>
+
+  <!-- Dropzone -->
+   <script type="text/javascript">
+    new Dropzone('#image-upload', {
+      thumbnailWidth: 200,
+      acceptedFiles: ".jpeg,.jpg,.png"
+    })
+   </script>
 
   <!-- Enhanced particlesJS Configuration -->
   <script>
