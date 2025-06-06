@@ -14,7 +14,8 @@ class Sdg extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
+        'cover_photo',
+        'name',
         'slug',
     ];
 

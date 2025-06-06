@@ -33,7 +33,7 @@ class LoginController extends Controller
             session(['sdg_id' => $user->current_sdg_id]);
 
             // Redirect back to homepage
-            return redirect('/')->with(['success' => 'You are now logged in!']);
+            return redirect('/sdgs')->with(['success' => 'You are now logged in!']);
         } else {
             return redirect('/')->with(['failure' => 'Invalid credentials']);
         }

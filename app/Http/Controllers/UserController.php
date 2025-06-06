@@ -25,8 +25,8 @@ class UserController extends Controller
 
         // Fetch users assigned to the same SDG (e.g., other staff)
         $staffUsers = User::where('current_sdg_id', '=', $user->current_sdg_id)
-            ->where('id', '!=', Auth::id()) // Exclude the current user
-            ->role(['staff', 'project-manager'])
+            // ->where('id', '!=', Auth::id()) // Exclude the current user
+            ->role(['staff', 'project-manager', 'admin'])
             ->get();
 
         return view('users.index', compact('staffUsers', 'sdg', 'sdgs'));

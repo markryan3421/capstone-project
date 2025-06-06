@@ -14,6 +14,16 @@ Route::get('/', [LoginController::class, 'index']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
+// SDG Related Routes
+Route::middleware('auth')->group(function() {
+  Route::get('/sdgs', [SdgController::class, 'index'])->name('sdgs.index');
+  Route::get('/sdgs/create', [SdgController::class, 'create'])->name('sdgs.create');
+  Route::post('/sdgs/store', [SdgController::class, 'store'])->name('sdgs.store');
+  Route::get('/sdgs/{sdg:slug}/edit', [SdgController::class, 'edit'])->name('sdgs.edit');
+  Route::put('/sdgs/{sdg:slug}/update', [SdgController::class, 'update'])->name('sdgs.update');
+  Route::delete('/sdgs/{sdg:slug}/delete', [SdgController::class, 'destroy'])->name('sdgs.delete');
+});
+
 // Settings Related Routes
 Route::middleware('auth')->prefix('settings')->name('settings.')->group(function () {
 
