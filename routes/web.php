@@ -7,6 +7,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TaskProductivityController;
 
@@ -94,3 +95,6 @@ Route::middleware('auth')->group(function() {
   Route::get('/reports/compliance', [GoalController::class, 'complianceReport'])->name('reports.compliance');
   Route::get('/reports/non-compliance', [GoalController::class, 'nonComplianceReport'])->name('reports.non-compliance');
 });
+
+// Register all the routes to be broadcast
+Broadcast::routes();

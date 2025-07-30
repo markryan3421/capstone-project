@@ -288,5 +288,79 @@
   </footer>
         </main>
     </div>
+
+    <div id="notifications" style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        width: 320px;
+        max-width: 90vw;
+    "></div>
+
+    <script>
+        function initPrivateNotification() {
+            if (typeof window.Echo === 'undefined') {
+                console.warn('⏳ Echo not ready yet, retrying...');
+                setTimeout(initPrivateNotification, 200); // Retry in 200ms
+                return;
+            }
+
+            console.log('✅ Echo initialized, listening to private channel...');
+            window.Echo.private('private-chat.{{ Auth::user()->id }}')
+                .listen('AssignToStaffEvent', (e) => {
+                    showNotification({
+                        title: e.title || 'Private Notification',
+                        message: e.message,
+                        type: 'private',
+                        icon: e.icon || '🔒',
+                        time: new Date().toLocaleTimeString(),
+                        url: e.url
+                    });
+                });
+        }
+
+        // Call it when DOM is ready
+        document.addEventListener('DOMContentLoaded', initPrivateNotification);
+
+        function showNotification(data) {
+            const notificationsDiv = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            
+            notification.className = 'notification-entry';
+            notification.innerHTML = `
+                <div class="notification-container ${data.type}">
+                    <div class="notification-icon">${data.icon}</div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <span class="notification-title">${data.title}</span>
+                            <span class="notification-time">${data.time}</span>
+                        </div>
+                        <p class="notification-message">${data.message}</p>
+                    </div>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `;
+            
+            if (data.url) {
+                notification.querySelector('.notification-container').addEventListener('click', () => {
+                    window.location.href = data.url;
+                });
+            }
+            
+            notification.querySelector('.notification-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                notification.remove();
+            });
+            
+            notificationsDiv.appendChild(notification);
+            
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 8000);
+        }
+    </script>
 </body>
 </html>

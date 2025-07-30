@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Events\AssignToStaffEvent;
 use Illuminate\Support\Facades\Auth;
 
 class GoalController extends Controller
@@ -56,6 +57,7 @@ class GoalController extends Controller
         // Fetch all goals and its related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
         $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->latest()->get();
 
+        // (1)'tasks' model name, (2)'taskProductivities' relationship name from Task model, and (3)'user' relationship name from TaskProductivity model
         $goal = Goal::with(['tasks.taskProductivities.user'])->findOrFail($goal->id);
 
         // Return the index view and pass the $goals data
@@ -126,10 +128,17 @@ class GoalController extends Controller
             'status' => 'pending',
         ]);
 
+        // Check if there's user assigned
         if ($request->has('assigned_users')) {
             $goal->assignedUsers()->attach($request->assigned_users);
+        
+            // Loop through each assigned_users since we can assign one or more user
+            foreach ($request->assigned_users as $userId) {
+                // Trigger the event to assigned users where the message will be sent
+                event(new AssignToStaffEvent('A new goal has been assigned to you.', $userId));
+            }
         }
-
+        
         return redirect('/')->with([
             'success' => "Goal '{$goal->title}' created successfully!"
         ]);
@@ -143,7 +152,6 @@ class GoalController extends Controller
     public function show(Goal $goal)
     {   
         // Fetch the goal by ID and load its related project manager, assigned users, and SDG
-        // $goal = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->findOrFail($goal->id);
         $goal->load([
             'projectManager',
             'assignedUsers',
