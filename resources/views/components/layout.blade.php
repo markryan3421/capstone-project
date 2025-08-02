@@ -2,6 +2,7 @@
 <html lang="en" x-data="{ sidebarOpen: window.innerWidth > 1024 }">
 <head>
     <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SDG Dashboard</title>
     <link rel="icon" href="logo.png" type="image/png"> 
@@ -125,6 +126,65 @@
                 </div>
                 <p class="text-sm font-semibold text-gray-200">{{ Auth::user()->name }}</p>
                 <p class="text-xs text-gray-400 mt-1">{{ Auth::user()->email }}</p>
+            </div>
+
+            <!-- Notification Bell -->
+            <div class="relative ml-4" x-data="{ open: false }">
+                <button 
+                    @click="open = !open; loadNotificationList()"
+                    class="relative p-2 text-gray-400 hover:text-white transition-colors duration-200 focus:outline-none"
+                >
+                    <!-- Bell Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    
+                    <!-- Notification Counter -->
+                    <span 
+                        id="notification-count"
+                        class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full"
+                        style="display: none;"
+                    >0</span>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div 
+                    x-show="open"
+                    @click.away="open = false"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute right-0 mt-2 w-80 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 overflow-hidden"
+                    style="display: none;"
+                >
+                    <div class="px-4 py-3 border-b border-gray-700 flex justify-between items-center">
+                        <h3 class="text-sm font-semibold text-white">Notifications</h3>
+                        <button @click="open = false" class="text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-700 max-h-96 overflow-y-auto" id="notification-list">
+                        <!-- Loading state -->
+                        <div class="px-4 py-6 text-center">
+                            <div class="animate-pulse flex justify-center">
+                                <div class="h-8 w-8 bg-gray-700 rounded-full"></div>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-400">Loading notifications...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="px-4 py-2 bg-gray-800/80 text-center border-t border-gray-700">
+                        <a href="/notifications" class="text-xs text-blue-400 hover:text-blue-300 font-medium">
+                            View all notifications
+                        </a>
+                    </div>
+                </div>
             </div>
             
             <!-- Navigation Menu -->
@@ -289,45 +349,52 @@
         </main>
     </div>
 
-    <div id="notifications" style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        width: 320px;
-        max-width: 90vw;
-    "></div>
+    <!-- Toast Notification -->
+    <div id="notifications" class="fixed top-4 right-4 z-[9999] w-80 max-w-[90vw] space-y-3"></div>
 
     <script>
+        // Initialize notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            initPrivateNotification();
+            updateNotificationBell();
+        });
+
         function initPrivateNotification() {
             if (typeof window.Echo === 'undefined') {
-                console.warn('⏳ Echo not ready yet, retrying...');
-                setTimeout(initPrivateNotification, 200); // Retry in 200ms
+                console.warn('Echo not ready, retrying...');
+                setTimeout(initPrivateNotification, 200);
                 return;
             }
 
-            console.log('✅ Echo initialized, listening to private channel...');
-            window.Echo.private('private-chat.{{ Auth::user()->id }}')
-                .listen('AssignToStaffEvent', (e) => {
+            window.Echo.private(`App.Models.User.{{ Auth::user()->id }}`)
+                .notification((notification) => {
+                    console.log('New notification:', notification);
+                    
+                    // Show toast notification
                     showNotification({
-                        title: e.title || 'Private Notification',
-                        message: e.message,
-                        type: 'private',
-                        icon: e.icon || '🔒',
-                        time: new Date().toLocaleTimeString(),
-                        url: e.url
+                        title: notification.title || 'New Assignment',
+                        message: notification.message,
+                        type: 'info',
+                        icon: '📋',
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        url: notification.url || null
                     });
-                });
-        }
 
-        // Call it when DOM is ready
-        document.addEventListener('DOMContentLoaded', initPrivateNotification);
+                    // Update the bell counter
+                    updateNotificationBell();
+                    
+                    // Reload dropdown if open
+                    if (document.querySelector('[x-data="{ open: false }"]').__x.$data.open) {
+                        loadNotificationList();
+                    }
+            });
+        }
 
         function showNotification(data) {
             const notificationsDiv = document.getElementById('notifications');
             const notification = document.createElement('div');
             
-            notification.className = 'notification-entry';
+            notification.className = 'notification-entry animate-fade-in';
             notification.innerHTML = `
                 <div class="notification-container ${data.type}">
                     <div class="notification-icon">${data.icon}</div>
@@ -341,25 +408,129 @@
                     <button class="notification-close">&times;</button>
                 </div>
             `;
-            
+
             if (data.url) {
                 notification.querySelector('.notification-container').addEventListener('click', () => {
                     window.location.href = data.url;
                 });
             }
-            
+
             notification.querySelector('.notification-close').addEventListener('click', (e) => {
                 e.stopPropagation();
-                notification.remove();
+                notification.classList.add('animate-fade-out');
+                setTimeout(() => notification.remove(), 300);
             });
-            
+
             notificationsDiv.appendChild(notification);
             
             // Auto-remove after 8 seconds
             setTimeout(() => {
-                notification.classList.add('fade-out');
-                setTimeout(() => notification.remove(), 300);
+                if (notification.parentNode) {
+                    notification.classList.add('animate-fade-out');
+                    setTimeout(() => notification.remove(), 300);
+                }
             }, 8000);
+        }
+
+        function updateNotificationBell() {
+            fetch('/notifications/unread-count')
+                .then(res => res.json())
+                .then(data => {
+                    const counter = document.getElementById('notification-count');
+                    counter.textContent = data.count;
+                    counter.style.display = data.count > 0 ? 'block' : 'none';
+                })
+                .catch(err => console.error('Error fetching notification count:', err));
+        }
+
+        function loadNotificationList() {
+            const list = document.getElementById('notification-list');
+            list.innerHTML = `
+                <div class="px-4 py-6 text-center">
+                    <div class="animate-pulse flex justify-center">
+                        <div class="h-8 w-8 bg-gray-700 rounded-full"></div>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-400">Loading notifications...</p>
+                </div>
+            `;
+
+            fetch('/notifications/unread')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.notifications.length === 0) {
+                        list.innerHTML = `
+                            <div class="px-4 py-6 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <p class="mt-2 text-sm text-gray-400">No new notifications</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    let html = '';
+                    data.notifications.forEach(n => {
+                        html += `
+                            <a href="${n.url || '#'}" 
+                            class="block px-4 py-3 hover:bg-gray-700/50 transition-colors duration-150 notification-item"
+                            data-id="${n.id}"
+                            @click="markAsRead('${n.id}')"
+                            >
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 pt-0.5">
+                                        <div class="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <p class="text-sm font-medium text-white">
+                                            ${n.title}
+                                            ${n.read_at ? '' : '<span class="ml-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>'}
+                                        </p>
+                                        <p class="text-xs text-gray-300 mt-1">${n.message}</p>
+                                        <p class="text-xs text-gray-500 mt-1">${n.time}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+
+                    list.innerHTML = html;
+                    
+                    // Add click handlers
+                    document.querySelectorAll('.notification-item').forEach(el => {
+                        el.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            markNotificationAsRead(id);
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading notifications:', err);
+                    list.innerHTML = `
+                        <div class="px-4 py-6 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-400">Error loading notifications</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function markNotificationAsRead(id) {
+            fetch(`/notifications/read/${id}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            }).then(() => {
+                updateNotificationBell();
+            });
         }
     </script>
 </body>

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Events\AssignToStaffEvent;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AssignToStaffNotification;
 
 class GoalController extends Controller
 {
@@ -134,8 +135,16 @@ class GoalController extends Controller
         
             // Loop through each assigned_users since we can assign one or more user
             foreach ($request->assigned_users as $userId) {
+                $user = User::find($userId);
                 // Trigger the event to assigned users where the message will be sent
-                event(new AssignToStaffEvent('A new goal has been assigned to you.', $userId));
+                // event(new AssignToStaffEvent('A new goal has been assigned to you.', $userId));
+
+                // Send notification to the user
+                $user->notify(new AssignToStaffNotification(
+                    "New Goal Assigned",
+                    "{$goal->title}",
+                    route('goals.show', ['goal' => $goal->slug])
+                ));
             }
         }
         

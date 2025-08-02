@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TaskProductivityController;
 
 Route::get('/', [LoginController::class, 'index']);
@@ -96,5 +97,12 @@ Route::middleware('auth')->group(function() {
   Route::get('/reports/non-compliance', [GoalController::class, 'nonComplianceReport'])->name('reports.non-compliance');
 });
 
-// Register all the routes to be broadcast
-Broadcast::routes();
+// // Register all the routes to be broadcast
+// Broadcast::routes();
+
+// Notification Controller
+Route::middleware('auth')->group(function() {
+  Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+  Route::get('/notifications/unread', [NotificationController::class, 'unreadNotif']);
+  Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
+});
