@@ -9,9 +9,8 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Events\AssignToStaffEvent;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AssignToStaffNotification;
+use App\Notifications\TaskStatusNotification;
 
 class GoalController extends Controller
 {
@@ -23,6 +22,7 @@ class GoalController extends Controller
 
         return view('reports.non-compliance', compact('nonCompliantGoals'));
     }
+    
     public function complianceReport() {
         $compliantGoals = Goal::where('compliance_percentage', 100)
             ->with(['projectManager', 'assignedUsers', 'sdg'])
@@ -55,13 +55,21 @@ class GoalController extends Controller
      */
     public function index(Goal $goal)
     {
-        // Fetch all goals and its related projectManager, assignedUsers, and SDG (All relationship name from Goal model)
-        $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])->latest()->get();
+        // Only fetch goals that the authenticated user is assigned to
+        $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])
+            ->whereHas('assignedUsers', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->latest()
+            ->get();
 
-        // (1)'tasks' model name, (2)'taskProductivities' relationship name from Task model, and (3)'user' relationship name from TaskProductivity model
-        $goal = Goal::with(['tasks.taskProductivities.user'])->findOrFail($goal->id);
+        // Fetch the specific goal with tasks & productivity if the user is assigned to it
+        $goal = Goal::with(['tasks.taskProductivities.user'])
+            ->whereHas('assignedUsers', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->findOrFail($goal->id);
 
-        // Return the index view and pass the $goals data
         return view('goals.index', compact('goals', 'goal'));
     }
 
@@ -90,7 +98,6 @@ class GoalController extends Controller
      */
     public function store(Request $request)
     {
-
         $incomingFields = $request->validate([
             'project_manager_id' => 'required|exists:users,id',
             'sdg_id' => 'required|exists:sdgs,id',
@@ -117,6 +124,7 @@ class GoalController extends Controller
             ],
         ]);
 
+        // Create the goal
         $goal = Goal::create([
             'project_manager_id' => Auth::id(),
             'sdg_id' => $incomingFields['sdg_id'],
@@ -129,25 +137,27 @@ class GoalController extends Controller
             'status' => 'pending',
         ]);
 
-        // Check if there's user assigned
+        $goal->load('projectManager');
+        $sender = Auth::user();
+
+        // Assign staff and notify
         if ($request->has('assigned_users')) {
             $goal->assignedUsers()->attach($request->assigned_users);
-        
-            // Loop through each assigned_users since we can assign one or more user
+
             foreach ($request->assigned_users as $userId) {
                 $user = User::find($userId);
-                // Trigger the event to assigned users where the message will be sent
-                // event(new AssignToStaffEvent('A new goal has been assigned to you.', $userId));
 
-                // Send notification to the user
-                $user->notify(new AssignToStaffNotification(
-                    "New Goal Assigned",
-                    "{$goal->title}",
-                    route('goals.show', ['goal' => $goal->slug])
+                $user->notify(new TaskStatusNotification(
+                    "{$sender->name} assigned a new goal.",
+                    $goal->title,
+                    route('goals.show', ['goal' => $goal->slug]),
+                    $goal->id,
+                    $sender,
+                    $goal,
                 ));
             }
         }
-        
+
         return redirect('/')->with([
             'success' => "Goal '{$goal->title}' created successfully!"
         ]);
@@ -237,8 +247,26 @@ class GoalController extends Controller
             'status' => $incomingFields['status'],
         ]);
 
-        // Sync the assignedUsers using many-to-many relationship
-        $goal->assignedUsers()->sync($request->assigned_users);
+        $goal->load('projectManager');
+        $sender = Auth::user();
+
+        // Assign staff and notify
+        if ($request->has('assigned_users')) {
+            $goal->assignedUsers()->sync($request->assigned_users);
+
+            foreach ($request->assigned_users as $userId) {
+                $user = User::find($userId);
+
+                $user->notify(new TaskStatusNotification(
+                    "{$sender->name} made some changes to a goal.",
+                    "Go check it out.",
+                    route('goals.show', ['goal' => $goal->slug]),
+                    $goal->id,
+                    $sender,
+                    $goal,
+                ));
+            }
+        }
 
         return redirect('/')->with('success', "Goal '{$goal->title}' updated successfully!");
     }

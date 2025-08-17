@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Database\Seeders\SdgSeeder;
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\GoalTaskSeeder;
 use Database\Seeders\RolePermissionSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -30,8 +31,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
         ]);
-
-        // User::factory(10)->create();
-
+    
+        // $this->call([
+        //     GoalTaskSeeder::class,
+        // ]);
     }
 }

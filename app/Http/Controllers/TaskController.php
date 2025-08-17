@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Goal;
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskStatusNotification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Traits\GoalProgressUpdater;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -56,6 +59,23 @@ class TaskController extends Controller
         $goal = $task->goal;
         $this->updateGoalProgress($goal);
 
+        // Send notification
+        $sender = Auth::user();
+
+        // Notify the staffs assigned
+        $assignedUsers = $goal->assignedUsers;
+
+        foreach($assignedUsers as $user) {
+            $user->notify(new TaskStatusNotification(
+                "{$sender->name} assigned you a new task for {$goal->title}.",
+                "Go check it out.",
+                route('goals.show', ['goal' => $goal->slug]),
+                $goal->id,
+                $sender,
+                $goal
+            ));
+        }
+    
         return back()->with('success', 'Task created successfully.');
     }
 
@@ -100,6 +120,23 @@ class TaskController extends Controller
 
         $goal = $task->goal;
         $this->updateGoalProgress($goal);
+
+        $goal->load('projectManager');
+        $sender = Auth::user();
+
+        // Notify the staffs assigned
+        foreach ($request->assigned_users as $userId) {
+            $user = User::find($userId);
+
+            $user->notify(new TaskStatusNotification(
+                "{$sender->name} made some changes in {$goal->title} task.",
+                "Go check it out.",
+                route('goals.show', ['goal' => $goal->slug]),
+                $goal->id,
+                $sender,
+                $goal
+            ));
+        }
 
         return redirect("/goals/show/{$goal->slug}")->with('success', 'Task updated successfully.');
     }

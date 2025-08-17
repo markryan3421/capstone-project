@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\TaskProductivity;
 use App\Traits\GoalProgressUpdater;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\TaskStatusNotification;
 
 class TaskProductivityController extends Controller
 {
@@ -78,6 +79,19 @@ class TaskProductivityController extends Controller
 
         $this->updateGoalProgress($goal);
 
+        // Notify the user about the rejection
+        $admin = Auth::user();
+        $staff = $submission->user;
+
+        $staff->notify(new TaskStatusNotification(
+            "{$admin->name} rejected your task submission for {$task->title}.",
+            "Task rejected: {$request->remarks}",
+            route('goals.show', ['goal' => $submission->task->goal->slug]),
+            $submission->task->id,
+            $admin,
+            $submission->task->goal,
+        ));
+
         return redirect()->back()->with('success', 'Task submission rejected with remarks');
     }
 
@@ -89,11 +103,24 @@ class TaskProductivityController extends Controller
 
         $this->updateGoalProgress($submission->task->goal);
 
+        // Notify the user about the approval
+        $admin = Auth::user(); // The one who approved the task
+        $staff = $submission->user; // The staff whose task was approved
+
+        $staff->notify(new TaskStatusNotification(
+            "{$admin->name} approved your task submission for {$submission->task->title}.",
+            "Congratulations! Your task has been approved.",
+            route('goals.show', ['goal' => $submission->task->goal->slug]),
+            $submission->task->id,
+            $admin,
+            $submission->task->goal,
+        ));
+
         return back()->with('success', 'Task approved successfully.');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for submitting the task
      */
     public function create(Task $task)
     {
@@ -101,7 +128,7 @@ class TaskProductivityController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Submit a task assigned
      */
     public function submit(Request $request, Task $task)
     {
@@ -125,9 +152,6 @@ class TaskProductivityController extends Controller
         }
 
         $now = Carbon::now();
-        // $start = Carbon::createFromTimeString($task->start_time);
-        // $end = Carbon::createFromTimeString($task->end_time);
-        // $duration = $end->diffInMinutes($start);
 
         TaskProductivity::create(array_merge([
             'sdg_id' => $task->sdg_id,
@@ -146,6 +170,22 @@ class TaskProductivityController extends Controller
 
         $goal = $task->goal;
         $this->updateGoalProgress($goal);
+
+        // Send notification
+        $goal->load('projectManager');
+        $sender = Auth::user(); // The staff submitting that task
+
+        // Check if the project manager exists
+        if($goal->projectManager) {
+            $goal->projectManager->notify(new TaskStatusNotification(
+                "{$sender->name} submitted a task for {$goal->title}.",
+                "Go check it out.",
+                route('goals.show', ['goal' => $goal->slug]),
+                $goal->id,
+                $sender,
+                $goal
+            ));
+        }
 
         return redirect('/')->with('success', 'Task submitted successfully.');
     }

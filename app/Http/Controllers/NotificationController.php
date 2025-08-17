@@ -13,20 +13,23 @@ class NotificationController extends Controller
 
     public function unreadNotif() {
         return response()->json([
-            'notifications' => Auth::user()->unreadNotifications->take(5)->map(function ($notif) {
+            'notifications' => Auth::user()->unreadNotifications->map(function ($notif) {
                 return [
                     'id' => $notif->id,
+                    'icon' => $notif->data['icon'] ?? asset('storage/avatars/default.png'),
                     'title' => $notif->data['title'],
                     'message' => $notif->data['message'],
                     'url' => $notif->data['url'] ?? null,
                     'time' => $notif->created_at->diffForHumans(),
+                    'sender_name' => $notif->data['sender_name'] ?? '',
+                    'read_at' => $notif->read_at,
                 ];
             }),
         ]);
     }
 
     public function markAsRead($id) {
-        $notif = auth()->user()->unreadNotifications()->find($id);
+        $notif = Auth::user()->unreadNotifications()->find($id);
         if ($notif) {
             $notif->markAsRead();
         }

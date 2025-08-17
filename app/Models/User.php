@@ -73,8 +73,21 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'avatar' => 'string',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        if (!$this->avatar) {
+            return null;
+        }
+        
+        // Handle both full URLs and local storage paths
+        return filter_var($this->avatar, FILTER_VALIDATE_URL) 
+            ? $this->avatar 
+            : asset('storage/avatars/' . $this->avatar);
     }
 }

@@ -338,3 +338,46 @@ body {
 .notification-close:hover {
   color: rgba(255, 255, 255, 0.9);
 }
+
+.sound-toggle-btn {
+  --enabled-color: #4CAF50;  /* Green when ON */
+  --disabled-color: #f0f0f0; /* Light gray when OFF */
+  --hover-enabled: #45a049;   /* Darker green */
+  --hover-disabled: #e0e0e0;  /* Lighter gray */
+  
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--disabled-color);
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Enabled state */
+.sound-toggle-btn.enabled {
+  background-color: var(--enabled-color);
+  color: white;
+}
+
+/* Hover states */
+.sound-toggle-btn:not(.enabled):hover {
+  background-color: var(--hover-disabled);
+}
+.sound-toggle-btn.enabled:hover {
+  background-color: var(--hover-enabled);
+}
+
+/* Error state (same as before) */
+.sound-toggle-btn.error {
+  animation: shake 0.5s;
+  background-color: #f44336;
+  color: white;
+}

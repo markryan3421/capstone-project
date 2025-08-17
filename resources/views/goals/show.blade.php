@@ -178,21 +178,22 @@
                             }}">
                                 {{ ucfirst($task->status) }}
                             </span>
-
-                            @if($task->approval_status == 'rejected')
-                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">Rejected</span>
-                            @endif
                         </div>
                     </div>
-                    <div class="flex space-x-2 ml-4">
-                        <a href="/tasks/{{ $task->slug }}/submit" 
-                          class="flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md text-white text-sm transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Submit
-                        </a>
-                    </div>
+                    <!-- Check if the status is already approved. if yes, hide this button -->
+                    @if($task->status !== 'completed')
+                      <div class="flex space-x-2 ml-4">
+                          <a href="/tasks/{{ $task->slug }}/submit" 
+                            class="flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md text-white text-sm transition-colors duration-200">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Submit
+                          </a>
+                      </div>
+                    @else
+                      <!-- show nothing -->
+                    @endif
                 </div>
 
                 <!-- Task Body -->
@@ -242,15 +243,10 @@
                                         
                                         <!-- Status Display -->
                                         <div class="mt-2 pl-11">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                @if($submission->status === 'approved') bg-green-900/50 text-green-400
-                                                @elseif($submission->status === 'rejected') bg-red-900/50 text-red-400
-                                                @else bg-gray-700 text-gray-300 @endif">
-                                                {{ ucfirst($submission->status ?? 'pending') }}
-                                            </span>
-                                            
                                             @if($submission->status === 'rejected' && $submission->remarks)
-                                            <p class="text-xs text-red-400 mt-1">Remarks: {{ $submission->remarks }}</p>
+                                            <div class="font-mono">
+                                              <p class="text-sm text-red-400 mt-1"><span class="text-red-500 font-bold text-md">Remarks:</span> {{ $submission->remarks }}</p>
+                                            </div>
                                             @endif
                                         </div>
                                         

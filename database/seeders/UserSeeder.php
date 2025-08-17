@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
                 'current_sdg_id' => $sdgId,
             ]);
             $projectManager->assignRole('project-manager');
+            $projectManager->sdgs()->attach($sdgId);
 
             // Five Staff Members
             foreach (range(1, 5) as $j) {
@@ -46,6 +47,7 @@ class UserSeeder extends Seeder
                     'current_sdg_id' => $sdgId,
                 ]);
                 $staffUser->assignRole('staff');
+                $staffUser->sdgs()->attach($sdgId);
             }
         }
     }
