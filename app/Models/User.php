@@ -31,9 +31,7 @@ class User extends Authenticatable
         'password',
     ];
 
-    // public function sdg() {
-    //     return $this->belongsTo(Sdg::class);
-    // }
+    
 
     public function sdgs(): BelongsToMany
     {

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->longText('description')->nullable();
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->string('status')->default('pending'); // pending/in-progress/completed
             $table->string('type'); // long/short term
             $table->decimal('compliance_percentage', 5, 2)->default(0);

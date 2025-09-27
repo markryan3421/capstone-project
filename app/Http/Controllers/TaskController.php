@@ -44,7 +44,17 @@ class TaskController extends Controller
     {
         $incomingFields = $request->validate([
             'title' => 'required|max:255',
-            'deadline' => 'required|date|after_or_equal:today',
+            'description' => 'nullable',
+            'deadline' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) use ($goal) {
+                    if ($goal->deadline && \Carbon\Carbon::parse($value)->gt($goal->deadline)) {
+                        $fail("The {$attribute} cannot be later than the goal's deadline ({$goal->deadline}).");
+                    }
+                },
+            ],
         ]);
 
         $task = $goal->tasks()->create([
@@ -52,6 +62,7 @@ class TaskController extends Controller
             'sdg_id' => $goal->sdg_id,
             'slug' => Str::slug($incomingFields['title']),
             'title' => $incomingFields['title'],
+            'description' => $incomingFields['description'],
             'status' => 'pending',
             'deadline' => $incomingFields['deadline'],
         ]);

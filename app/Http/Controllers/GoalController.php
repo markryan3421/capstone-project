@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Sdg;
 use App\Models\Goal;
 use App\Models\Task;
@@ -51,29 +52,6 @@ class GoalController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     */
-    public function index(Goal $goal)
-    {
-        // Only fetch goals that the authenticated user is assigned to
-        $goals = Goal::with(['projectManager', 'assignedUsers', 'sdg'])
-            ->whereHas('assignedUsers', function ($query) {
-                $query->where('user_id', Auth::id());
-            })
-            ->latest()
-            ->get();
-
-        // Fetch the specific goal with tasks & productivity if the user is assigned to it
-        $goal = Goal::with(['tasks.taskProductivities.user'])
-            ->whereHas('assignedUsers', function ($query) {
-                $query->where('user_id', Auth::id());
-            })
-            ->findOrFail($goal->id);
-
-        return view('goals.index', compact('goals', 'goal'));
-    }
-
-    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -103,8 +81,12 @@ class GoalController extends Controller
             'sdg_id' => 'required|exists:sdgs,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_date'         => ['required', 'date', 'after_or_equal:today'],
+            'end_date'           => [
+                'required',
+                'date',
+                'after_or_equal:start_date',
+            ],
             'type' => 'required|in:short,long',
             'assigned_users.*' => [
                 'nullable',
@@ -132,8 +114,8 @@ class GoalController extends Controller
             'slug' => Str::slug($incomingFields['title']),
             'description' => $incomingFields['description'],
             'type' => $incomingFields['type'],
-            'start_date' => $incomingFields['start_date'],
-            'end_date' => $incomingFields['end_date'],
+            'start_date' => Carbon::parse($incomingFields['start_date'])->startOfDay(),
+            'end_date' => Carbon::parse($incomingFields['end_date'])->endOfDay(),
             'status' => 'pending',
         ]);
 
@@ -170,6 +152,12 @@ class GoalController extends Controller
      */
     public function show(Goal $goal)
     {   
+        $user = Auth::user();
+
+        // if(!$goal->assignedUsers->contains($user->id) || $user->hasRole('admin')) {
+        //     abort(403, 'Unauthorized action.');
+        // }
+
         // Fetch the goal by ID and load its related project manager, assigned users, and SDG
         $goal->load([
             'projectManager',

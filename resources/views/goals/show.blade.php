@@ -180,19 +180,125 @@
                             </span>
                         </div>
                     </div>
-                    <!-- Check if the status is already approved. if yes, hide this button -->
-                    @if($task->status !== 'completed')
-                      <div class="flex space-x-2 ml-4">
-                          <a href="/tasks/{{ $task->slug }}/submit" 
-                            class="flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md text-white text-sm transition-colors duration-200">
+                    @if($task->status === 'pending')
+                      @if(now()->timezone(config('app.timezone'))->lt($task->deadline))
+                        <!-- Submit Button (Before Deadline) -->
+                        <div class="flex items-center ml-4">
+                          <div class="flex items-center space-x-2">
+                            <a href="/tasks/{{ $task->slug }}/submit" 
+                              class="flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white text-xs font-medium transition-all duration-200 shadow hover:shadow-indigo-500/25">
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              Submit
-                          </a>
+                              Submit Task
+                            </a>
+                            <span class="text-xs text-gray-300 bg-gray-800/30 px-2 py-0.5 rounded">
+                              ⏰ Before {{ $task->deadline->format('M j, g:i A') }}
+                            </span>
+                          </div>
+                        </div>
+                      @else
+                        <!-- Resubmission Button (After Deadline) -->
+                        <div class="space-y-2">
+                          <div class="flex items-center text-red-300 text-xs bg-red-900/20 px-2 py-1 rounded border border-red-800/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Deadline passed
+                          </div>
+                          <form action="/request-resubmission/{{ $task->slug }}" method="post">
+                            @csrf
+                            <button type="submit"
+                                    class="flex items-center px-3 py-1.5 bg-amber-600 hover:bg-amber-500 rounded-lg text-white text-xs font-medium transition-all duration-200 shadow hover:shadow-amber-500/25">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Request Resubmission
+                            </button>
+                          </form>
+                        </div>
+                      @endif
+                    @elseif($task->status === 'resubmission_requested')
+                      @if(Auth::user()->hasAnyRole(['admin', 'project-manager']))
+                        <!-- Admin/Manager View -->
+                        <div class="space-y-2 p-3 bg-blue-900/20 rounded-lg border border-blue-800/30">
+                          <div class="flex items-center text-blue-300 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Resubmission Request
+                          </div>
+                          <p class="text-xs text-gray-300">Staff requested resubmission</p>
+                          
+                          <div class="flex space-x-2">
+                            <!-- Approve resubmission -->
+                            <form action="/tasks/{{ $task->slug }}/approve-resubmission" method="post">
+                              @csrf
+                              <button type="submit" class="flex items-center px-2.5 py-1 bg-green-700 hover:bg-green-600 rounded text-white text-xs transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Approve
+                              </button>
+                            </form>
+
+                            <!-- Reject resubmission -->
+                            <form action="/tasks/{{ $task->slug }}/reject-resubmission" method="post">
+                              @csrf
+                              <button type="submit" class="flex items-center px-2.5 py-1 bg-red-700 hover:bg-red-600 rounded text-white text-xs transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Reject
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      @else
+                        <!-- User View - Request Sent -->
+                        <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-blue-900/30 border border-blue-700/30 text-blue-300 text-xs">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          Request pending approval
+                        </div>
+                      @endif
+                    @elseif($task->status === 'approved_resubmission')
+                      <!-- Approved Resubmission -->
+                      <div class="space-y-2 ">
+                        <div class="flex items-center text-green-300 text-xs">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Resubmission Approved
+                        </div>
+                        <a href="/tasks/{{ $task->slug }}/resubmit" 
+                          class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white text-xs font-medium transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Submit Now
+                        </a>
+                      </div>
+                    @elseif($task->status === 'rejected_resubmission')
+                      <!-- Rejected Resubmission -->
+                      <div class="inline-flex items-center text-red-400 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Resubmission rejected. You can no longer submit task compliance.
                       </div>
                     @else
-                      <!-- show nothing -->
+                      <!-- Task Completed -->
+                      <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-800/30 border border-gray-700/30 text-green-300 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Task completed
+                      </div>
                     @endif
                 </div>
 

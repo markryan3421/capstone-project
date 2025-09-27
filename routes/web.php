@@ -89,6 +89,11 @@ Route::middleware('auth')->group(function() {
   Route::post('/submissions/{submission:id}/reject', [TaskProductivityController::class, 'reject'])->name('submissions.reject');
   Route::get('/submissions/{submission:id}/resubmit', [TaskProductivityController::class, 'resubmitForm'])->name('submissions.resubmit');
   Route::put('/submissions/{productivity:id}/resubmit', [TaskProductivityController::class, 'resubmit'])->name('submissions.resubmit');
+  Route::post('/request-resubmission/{task:slug}', [TaskProductivityController::class, 'requestResubmission'])->name('submissions.request-resubmission');
+  Route::post('/tasks/{task:slug}/approve-resubmission', [TaskProductivityController::class, 'approveResubmissionRequest'])->name('tasks.approve-resubmission');
+  Route::post('tasks/{task:slug}/reject-resubmission', [TaskProductivityController::class, 'rejectResubmissionRequest']);
+  Route::get('/tasks/{task:slug}/resubmit', [TaskProductivityController::class, 'lateSubmissionForm'])->name('submissions.late-form');
+  Route::put('/tasks/{task:slug}/resubmit-file', [TaskProductivityController::class, 'lateResubmission'])->name('submissions.late-submission');
 });
 
 // Report Routes
@@ -97,12 +102,15 @@ Route::middleware('auth')->group(function() {
   Route::get('/reports/non-compliance', [GoalController::class, 'nonComplianceReport'])->name('reports.non-compliance');
 });
 
-// // Register all the routes to be broadcast
-// Broadcast::routes();
-
-// Notification Controller
+// Notification Routes
 Route::middleware('auth')->group(function() {
   Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
   Route::get('/notifications/unread', [NotificationController::class, 'unreadNotif']);
   Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
 });
+
+// Profile Routes
+// Route::middleware('auth')->group(function() {
+//   Route::get();
+// });
+

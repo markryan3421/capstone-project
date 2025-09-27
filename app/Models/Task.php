@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Models\Sdg;
 use App\Models\Goal;
+use App\Models\User;
 use App\Traits\FilterBySdg;
 use App\Models\TaskProductivity;
 use Illuminate\Database\Eloquent\Model;
@@ -24,11 +26,24 @@ class Task extends Model
         'status',
         'remarks',
         'deadline',
+        'user_id',
     ];
+
     
     protected $casts = [
-        'deadline' => 'date',
+        'deadline' => 'datetime',
     ];
+
+    // This model ensures the deadline is set to the end of the day (11:59:59 PM)
+    public function setDeadlineAttribute($value)
+    {
+        $this->attributes['deadline'] = Carbon::parse($value, config('app.timezone'))->endOfDay();
+        // $this->attributes['deadline'] = Carbon::parse($value)->endOfDay();
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 
     public function goal(): BelongsTo {
         return $this->belongsTo(Goal::class);
