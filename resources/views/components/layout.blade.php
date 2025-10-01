@@ -122,17 +122,19 @@
         >
             <!-- User Profile -->
             <div class="flex flex-col items-center my-8">
-                @if(Auth::user()->avatar)
-                    <div class="w-25 h-25 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-md overflow-hidden">
-                            <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" 
-                                alt="Avatar" 
-                                class="w-full h-full object-cover">
-                    </div>
-                @else
-                    <div class="w-25 h-25 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-md overflow-hidden">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-                @endif
+                <a href="/profile/{{ Auth::user()->user_slug }}">
+                    @if(Auth::user()->avatar)
+                        <div class="w-25 h-25 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-md overflow-hidden">
+                                <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" 
+                                    alt="Avatar" 
+                                    class="w-full h-full object-cover">
+                        </div>
+                    @else
+                        <div class="w-25 h-25 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-md overflow-hidden">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
+                    @endif
+                </a>
                 <p class="text-sm font-semibold text-gray-200">
                     <a href="/{{ Auth::user()->name }}">
                         {{ Auth::user()->name }}

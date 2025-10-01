@@ -8,6 +8,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TaskProductivityController;
@@ -110,7 +111,9 @@ Route::middleware('auth')->group(function() {
 });
 
 // Profile Routes
-// Route::middleware('auth')->group(function() {
-//   Route::get();
-// });
+Route::middleware('auth')->group(function() {
+  Route::get('/profile/{user:user_slug}', [ProfileController::class, 'indexProfile'])->name('profile.index');
+  Route::get('/profile/{user:user_slug}/edit', [ProfileController::class, 'editProfile']);
+  Route::put('/profile/{user:user_slug}/update', [ProfileController::class, 'updateProfile']);
+});
 
