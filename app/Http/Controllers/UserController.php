@@ -149,7 +149,7 @@ class UserController extends Controller
             $user->sdgs()->detach();
         }
 
-        return redirect('/settings/users')->with('success', 'User updated successfully!');
+        return redirect('/settings/users')->with('success', 'User credentials updated successfully!');
     }
 
 

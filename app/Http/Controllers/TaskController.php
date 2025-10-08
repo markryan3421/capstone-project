@@ -50,8 +50,13 @@ class TaskController extends Controller
                 'date',
                 'after_or_equal:today',
                 function ($attribute, $value, $fail) use ($goal) {
-                    if ($goal->deadline && \Carbon\Carbon::parse($value)->gt($goal->deadline)) {
-                        $fail("The {$attribute} cannot be later than the goal's deadline ({$goal->deadline}).");
+                    if ($goal && $goal->end_date) {
+                        $taskDeadline = \Carbon\Carbon::parse($value);
+                        $goalDeadline = \Carbon\Carbon::parse($goal->end_date);
+
+                        if ($taskDeadline->gt($goalDeadline)) {
+                            $fail("The {$attribute} cannot be later than the goal's deadline ({$goalDeadline->toFormattedDateString()}).");
+                        }
                     }
                 },
             ],

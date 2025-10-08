@@ -176,21 +176,8 @@
       </ul>
     </nav>
 
-    @if (session()->has('failure'))
-    <div class="container container--narrow">
-      <div class="alert alert-danger text-center">
-        {{session('failure')}}
-      </div>
-    </div>
-    @endif
-
-    @if (session()->has('success'))
-    <div class="container container--narrow">
-      <div class="alert alert-success text-center">
-        {{session('success')}}
-      </div>
-    </div>
-    @endif
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm w-full"></div>
 
     <!-- Dynamic Content Area -->
     <main class="content-transition glass-card rounded-2xl p-6 md:p-8">
@@ -204,6 +191,91 @@
       <p>© {{ date('Y') }} SDG. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Toast Notification -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+            createToast('success', '{{ session('success') }}');
+        @endif
+
+        @if ($errors->any())
+            createToast('error', {!! json_encode($errors->all()) !!});
+        @endif
+    });
+
+    function createToast(type, message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        if (type === 'success') {
+            toast.innerHTML = `
+                <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg shadow-lg p-4 transform transition-all duration-300 ease-in-out translate-x-full opacity-0">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 text-green-500 dark:text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-sm font-medium text-green-800 dark:text-green-200">${message}</span>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-green-500 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            const errors = Array.isArray(message) ? message : [message];
+            toast.innerHTML = `
+                <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg shadow-lg p-4 transform transition-all duration-300 ease-in-out translate-x-full opacity-0">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <svg class="h-5 w-5 text-red-500 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-sm font-medium text-red-800 dark:text-red-200">There were errors:</span>
+                            </div>
+                            <ul class="list-disc pl-5 space-y-1 text-sm text-red-700 dark:text-red-300">
+                                ${errors.map(error => `<li>${error}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors ml-3">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            const toastContent = toast.querySelector('div');
+            toastContent.classList.remove('translate-x-full', 'opacity-0');
+            toastContent.classList.add('translate-x-0', 'opacity-100');
+        }, 10);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentElement) {
+                const toastContent = toast.querySelector('div');
+                toastContent.classList.remove('translate-x-0', 'opacity-100');
+                toastContent.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.parentElement.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+    </script>
 
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
