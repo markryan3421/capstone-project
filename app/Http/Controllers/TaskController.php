@@ -139,11 +139,10 @@ class TaskController extends Controller
 
         $goal->load('projectManager');
         $sender = Auth::user();
+        $assignedUsers = $goal->assignedUsers;
 
         // Notify the staffs assigned
-        foreach ($request->assigned_users as $userId) {
-            $user = User::find($userId);
-
+        foreach ($assignedUsers as $user) {
             $user->notify(new TaskStatusNotification(
                 "{$sender->name} made some changes in {$goal->title} task.",
                 "Go check it out.",
@@ -160,8 +159,11 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Task $task)
+    public function delete(Goal $goal, Task $task)
     {
-        //
+        $goal = $task->goal;
+        $task->delete();
+
+        return redirect()->back()->with('success', 'Task deleted successfully.');
     }
 }

@@ -18,60 +18,56 @@ class TaskProductivityController extends Controller
 {
     use GoalProgressUpdater;
 
-    // Approve late resubmission
-    public function lateResubmission(Request $request, TaskProductivity $productivity) {
-        $goal = $productivity->task->goal;
+    // Approved late resubmission
+    public function lateResubmission(Request $request, Task $task) {
+        $goal = $task->goal;
 
-        // Validate incoming request
-        $request->validate([
+        // (1) For the task itself
+        $incomingFields = $request->validate([
             'subject' => 'required|string|max:255',
             'comments' => 'nullable|string',
-            'file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
+            'files' => 'required',
+            'files.*' => 'file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
-        // Handle file upload if exists
-        $fileData = [];
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filePath = $file->store('task_files', 'public');
+        // (2) For the files being submitted
+        $taskProductivity = TaskProductivity::updateOrCreate(
+            [
+                'task_id' => $task->id,
+                'user_id' => Auth::id(),
+                'updated_at' => now()->toDateString(),
+            ],
+            [
+                'sdg_id' => $task->sdg_id,
+                'goal_id' => $task->goal_id,
+                'subject' => $incomingFields['subject'],
+                'comments' => $incomingFields['comments'],
+                'status' => 'pending',
+                'remarks' => 'Pending for review',
+                'date' => now()->toDateString(),
+            ]
+        );
 
-            $fileData = [
+        foreach($incomingFields['files'] as $file) {
+            $filePath = $file->store('task_productivities', 'public');
+
+            $taskProductivity->taskProductivityFiles()->updateOrCreate([
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
                 'file_type' => $file->getClientMimeType(),
                 'file_path' => $filePath,
-            ];
+            ]);
         }
 
-        $now = now();
-
-        // Use updateOrCreate (either create new OR update existing)
-        $productivity = TaskProductivity::updateOrCreate(
-            [
-                // Unique condition: only one record per user per task
-                'task_id' => $productivity->task->id,
-                'user_id' => Auth::id(),
-            ],
-            array_merge([
-                'sdg_id' => $productivity->task->sdg_id,
-                'goal_id' => $productivity->task->goal_id,
-                'subject' => $request->subject,
-                'comments' => $request->comments,
-                'date' => $now->toDateString(),
-                'status' => 'pending',
-                'remarks' => 'Pending for review',
-            ], $fileData)
-        );
-
         // Update goal progress
-        $this->updateGoalProgress($goal);
+        // $this->updateGoalProgress($productivity->task->goal);
 
         // Notify project manager
         $goal->load('projectManager');
         $sender = Auth::user();
 
         if ($goal->projectManager) {
-            $action = $productivity->wasRecentlyCreated ? 'submitted' : 'resubmitted';
+            $action = $task->wasRecentlyCreated ? 'submitted' : 'resubmitted';
 
             $goal->projectManager->notify(new TaskStatusNotification(
                 "{$sender->name} {$action} a task for {$goal->title}.",
@@ -169,63 +165,6 @@ class TaskProductivityController extends Controller
         return back()->with('success', 'Resubmission request sent successfully.');
     }
 
-    public function resubmit(Request $request, TaskProductivity $productivity) {
-        // Validate incoming data from the resubmit form
-        $request->validate([
-            'subject' => 'required|string|max:255',
-            'comments' => 'nullable|string',
-            'file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
-        ]);
-
-        // Prepare file data if a new file is uploaded
-        $fileData = [];
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-
-            // Store file in 'public/task_files' and get the path
-            $filePath = $file->store('task_files', 'public');
-
-            // Save file details for updating
-            $fileData = [
-                'file_name' => $file->getClientOriginalName(),
-                'file_size' => $file->getSize(),
-                'file_type' => $file->getClientMimeType(),
-                'file_path' => $filePath,
-            ];
-        }
-
-        // Update the task productivity record
-        $productivity->update(array_merge([
-            'subject' => $request->subject,
-            'comments' => $request->comments,
-            'status' => 'pending',             // Reset the status
-            'remarks' => 'Pending for review', // Clear the previous rejection remarks
-            'date' => now()->toDateString(),   // Update the date of resubmission
-        ], $fileData));                        // Merge file data if any
-
-        // Update goal progress after resubmission
-        $this->updateGoalProgress($productivity->task->goal);
-
-        $goal = $productivity->task->goal;
-        // Send notification
-        $goal->load('projectManager');
-        $sender = Auth::user(); // The staff submitting that task
-
-        // Check if the project manager exists
-        if($goal->projectManager) {
-            $goal->projectManager->notify(new TaskStatusNotification(
-                "{$sender->name} resubmitted a task for {$goal->task->title}.",
-                "Go check it out.",
-                route('goals.show', ['goal' => $goal->slug]),
-                $goal->id,
-                $sender,
-                $goal
-            ));
-        }
-
-        return redirect('/')->with('success', 'Task submitted successfully.');
-    }
-
     public function resubmitForm($id) {
         $productivity = TaskProductivity::findOrFail($id);
 
@@ -298,51 +237,47 @@ class TaskProductivityController extends Controller
         return view('tasks.submit-task', compact('task'));
     }
 
-    /**
-     * Submit task
-     */
-    public function submit(Request $request, Task $task)
-    {
-        $goal = $task->goal;
-
-        $request->validate([
+    public function resubmit(Request $request, TaskProductivity $productivity) {
+        // Validate incoming data from the resubmit form
+        $incomingFields = $request->validate([
             'subject' => 'required|string|max:255',
             'comments' => 'nullable|string',
-            'file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
+            'files' => 'required',
+            'files.*' => 'file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
-        $fileData = [];
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filePath = $file->store('task_files', 'public');
+        $productivity->updateOrCreate(
+            [
+                'task_id' => $productivity->task->id,
+                'user_id' => Auth::id(),
+                'updated_at' => now()->toDateString(),
+            ],
+            [
+                'sdg_id' => $productivity->task->sdg_id,
+                'goal_id' => $productivity->task->goal_id,
+                'subject' => $incomingFields['subject'],
+                'comments' => $incomingFields['comments'],
+                'status' => 'pending',
+                'remarks' => 'Pending for review',
+                'date' => now()->toDateString(),
+            ]
+        );
 
-            $fileData = [
+        foreach($incomingFields['files'] as $file) {
+            $filePath = $file->store('task_productivities', 'public');
+
+            $productivity->taskProductivityFiles()->updateOrCreate([
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
                 'file_type' => $file->getClientMimeType(),
                 'file_path' => $filePath,
-            ];
+            ]);
         }
 
-        $now = Carbon::now();
+        // Update goal progress after resubmission
+        $this->updateGoalProgress($productivity->task->goal);
 
-        TaskProductivity::create(array_merge([
-            'sdg_id' => $task->sdg_id,
-            'goal_id' => $task->goal_id,
-            'task_id' => $task->id,
-            'user_id' => Auth::id(),
-            'subject' => $request->subject,
-            'comments' => $request->comments,
-            'date' => $now->toDateString(),
-            // 'start_time' => $start->format('H:i:s'),
-            // 'end_time' => $end->format('H:i:s'),
-            // 'time_rendered' => $duration,
-            'status' => 'pending',
-            'remarks' => 'Pending for review',
-        ], $fileData));
-
-        $this->updateGoalProgress($goal);
-
+        $goal = $productivity->task->goal;
         // Send notification
         $goal->load('projectManager');
         $sender = Auth::user(); // The staff submitting that task
@@ -350,7 +285,7 @@ class TaskProductivityController extends Controller
         // Check if the project manager exists
         if($goal->projectManager) {
             $goal->projectManager->notify(new TaskStatusNotification(
-                "{$sender->name} submitted a task for {$goal->title}.",
+                "{$sender->name} resubmitted a task for {$goal->task->title}.",
                 "Go check it out.",
                 route('goals.show', ['goal' => $goal->slug]),
                 $goal->id,
@@ -361,5 +296,67 @@ class TaskProductivityController extends Controller
 
         return redirect('/')->with('success', 'Task submitted successfully.');
     }
-    
+
+    /**
+     * Submit task
+     */
+    public function submit(Request $request, Task $task)
+    {
+        $goal = $task->goal;
+
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'comments' => 'nullable|string',
+            'files' => 'required',
+            'files.*' => 'file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
+        ]);
+
+        // ✅ Check if a productivity record already exists for this user & task today
+        $taskProductivity = TaskProductivity::firstOrCreate(
+            [
+                'task_id' => $task->id,
+                'user_id' => Auth::id(),
+                'date' => now()->toDateString(),
+            ],
+            [
+                'sdg_id' => $task->sdg_id,
+                'goal_id' => $task->goal_id,
+                'subject' => $request->subject,
+                'comments' => $request->comments,
+                'status' => 'pending',
+                'remarks' => 'Pending for review',
+            ]
+        );
+
+        // ✅ Attach multiple uploaded files
+        foreach ($request->file('files') as $file) {
+            $filePath = $file->store('task_productivities', 'public');
+
+            $taskProductivity->taskProductivityFiles()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'file_type' => $file->getClientMimeType(),
+                'file_path' => $filePath,
+            ]);
+        }
+
+        // ✅ Update progress and notify project manager
+        $this->updateGoalProgress($goal);
+        $goal->load('projectManager');
+        $sender = Auth::user();
+
+        if ($goal->projectManager) {
+            $goal->projectManager->notify(new TaskStatusNotification(
+                "{$sender->name} submitted a task for {$goal->title}.",
+                "Go check it out.",
+                route('goals.show', ['goal' => $goal->slug]),
+                $goal->id,
+                $sender,
+                $goal
+            ));
+        }
+
+        return redirect('/')
+            ->with('success', 'Task submitted successfully.');
+    }
 }

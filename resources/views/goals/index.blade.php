@@ -1,13 +1,14 @@
 <x-layout class="bg-gray-900 text-white min-h-screen">
     <!-- Back Button and Notification Bell -->
     <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-        <!-- Back Button -->
+        <!-- Updated Back Button -->
         <div>
-            <a href="/sdgs" class="underline-offset-4 hover:underline inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                    <path fill-rule="evenodd" d="M7.793 2.232a.75.75 0 0 1-.025 1.06L3.622 7.25h10.003a5.375 5.375 0 0 1 0 10.75H10.75a.75.75 0 0 1 0-1.5h2.875a3.875 3.875 0 0 0 0-7.75H3.622l4.146 3.957a.75.75 0 0 1-1.036 1.085l-5.5-5.25a.75.75 0 0 1 0-1.085l5.5-5.25a.75.75 0 0 1 1.06.025Z" clip-rule="evenodd" />
+            <a href="/sdgs" class="inline-flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 border border-slate-600/50 text-slate-200 hover:text-white transition-all duration-300 group shadow-lg hover:shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 group-hover:text-blue-300 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                &nbsp;Back to SDGs
+                <span class="font-medium tracking-tight text-lg">Go back to SDG Preview</span>
             </a>
         </div>
 
@@ -134,15 +135,6 @@
         </div>
     </div>
 
-    <button id="enable-sounds" class="sound-toggle-btn" aria-label="Toggle notification sounds">
-        <span class="sound-icon">🔔</span>
-        <span class="sound-text">Enable Sounds</span>
-    </button>
-
-    <audio id="notification-sound" preload="auto" 
-        src="{{ asset('sounds/notification.mp3') }}">
-    </audio>
-
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
@@ -187,15 +179,17 @@
                     </span>
                 </div>
             </div>
+            
             <div> <!-- Increased height from h-80 to h-[400px] -->
-                <canvas id="complianceChart" width="400" height="100"></canvas>
+                <!-- <canvas id="complianceChart" width="400" height="100"></canvas> -->
+                <canvas id="complianceChart" width="200" height="200"></canvas>
             </div>
         </div>
 
         <!-- Goals Distribution Chart - 25% width -->
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg lg:col-span-1">
             <h3 class="text-xl font-semibold text-white mb-8">Goals Distribution</h3> <!-- Increased mb-6 to mb-8 -->
-            <div width="400" height="500"> <!-- Increased height from h-80 to h-[400px] -->
+            <div width="500"> 
                 <canvas id="distributionChart"></canvas>
             </div>
         </div>
@@ -294,223 +288,16 @@
     </div>
 
     <script>
-        // Compliance Chart with adjusted spacing
-        const complianceCtx = document.getElementById('complianceChart').getContext('2d');
-        const complianceChart = new Chart(complianceCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Total Goals', 'Compliant', 'Non-Compliant'],
-                datasets: [{
-                    label: 'Count',
-                    data: [{{ $totalGoals }}, {{ $compliantGoals }}, {{ $nonCompliantGoals }}],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.7)',
-                        'rgba(16, 185, 129, 0.7)',
-                        'rgba(239, 68, 68, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(239, 68, 68, 1)'
-                    ],
-                    borderWidth: 1,
-                    barPercentage: 0.6, // Makes bars wider
-                    categoryPercentage: 0.8 // Adds more space between categories
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        top: 20,
-                        right: 20,
-                        bottom: 20,
-                        left: 20
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(31, 41, 55, 0.9)',
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 14 },
-                        titleColor: 'rgb(209, 213, 219)',
-                        bodyColor: 'rgb(209, 213, 219)',
-                        borderColor: 'rgba(75, 85, 99, 1)',
-                        borderWidth: 1,
-                        padding: 16,
-                        usePointStyle: true
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(75, 85, 99, 0.5)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: 'rgb(156, 163, 175)',
-                            font: { size: 12 },
-                            padding: 10 // Added y-axis tick padding
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: 'rgb(156, 163, 175)',
-                            font: { size: 12 },
-                            padding: 10 // Added x-axis tick padding
-                        }
-                    }
-                }
-            }
-        });
-
-        // Distribution Chart with adjusted spacing
-        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-        const distributionChart = new Chart(distributionCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Short Term', 'Long Term'],
-                datasets: [{
-                    data: [{{ $goals->where('type', 'short')->count() }}, {{ $goals->where('type', 'long')->count() }}],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.7)',
-                        'rgba(139, 92, 246, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(139, 92, 246, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        top: 20,
-                        right: 20,
-                        bottom: 20,
-                        left: 20
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: 'rgb(209, 213, 219)',
-                            font: { size: 12 },
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(31, 41, 55, 0.9)',
-                        titleFont: { size: 14 },
-                        bodyFont: { size: 14 },
-                        titleColor: 'rgb(209, 213, 219)',
-                        bodyColor: 'rgb(209, 213, 219)',
-                        borderColor: 'rgba(75, 85, 99, 1)',
-                        borderWidth: 1,
-                        padding: 16,
-                        usePointStyle: true
-                    }
-                },
-                cutout: '60%', // Reduced from 65% to make pie thicker
-                spacing: 10 // Added spacing between elements
-            }
-        });
+        window.chartData = {
+            totalGoals: {{ $totalGoals }},
+            compliantGoals: {{ $compliantGoals }},
+            nonCompliantGoals: {{ $nonCompliantGoals }},
+            shortTermCount: {{ $goals->where('type', 'short')->count() }},
+            longTermCount: {{ $goals->where('type', 'long')->count() }}
+        };
     </script>
 
     <script>
-        let notificationSound;
-        let soundToggle;
-        // Initialize notification system
-        document.addEventListener('DOMContentLoaded', function() {
-            initPrivateNotification();
-            updateNotificationBell();
-
-            soundToggle = document.getElementById('enable-sounds');
-            notificationSound = document.getElementById('notification-sound');
-            notificationSound.volume = 0.3;
-
-            updateButtonState();
-
-            soundToggle.addEventListener('click', toggleSound);
-        });
-
-        function toggleSound() {
-            const isEnabled = localStorage.getItem('soundsEnabled') === 'true';
-            
-            // Immediately toggle state (don't wait for playback test)
-            localStorage.setItem('soundsEnabled', !isEnabled);
-            updateButtonState();
-
-            // Only test playback if enabling (not disabling)
-            if (!isEnabled) {
-                testAudioPlayback();
-            }
-        }
-
-        function testAudioPlayback() {
-            notificationSound.currentTime = 0;
-            notificationSound.play()
-                .then(() => {
-                notificationSound.pause();
-                notificationSound.currentTime = 0;
-                })
-                .catch(e => {
-                console.error("Audio blocked:", e);
-                localStorage.setItem('soundsEnabled', 'false');
-                updateButtonState();
-                showPermissionAlert();
-                });
-        }
-
-        function updateButtonState() {
-            const isEnabled = localStorage.getItem('soundsEnabled') === 'true';
-            soundToggle.querySelector('.sound-icon').textContent = isEnabled ? '🔊' : '🔔';
-            soundToggle.querySelector('.sound-text').textContent = isEnabled ? 'Disable Sounds' : 'Enable Sounds';
-            soundToggle.classList.toggle('enabled', isEnabled);
-        }
-
-        function showPermissionAlert() {
-            soundToggle.classList.add('error');
-            setTimeout(() => soundToggle.classList.remove('error'), 1000);
-        }
-
-        // Global function - now can access notificationSound
-        window.playNotificationSound = () => {
-            if (localStorage.getItem('soundsEnabled') === 'true') {
-                notificationSound.currentTime = 0;
-                notificationSound.play()
-                .catch(e => {
-                    console.error("Playback failed:", e);
-                    // Don't disable sounds automatically - just show error
-                    soundToggle.classList.add('error');
-                    setTimeout(() => soundToggle.classList.remove('error'), 1000);
-                });
-            }
-        };
-
-        function playNotificationSound() {
-            try {
-                const sound = new Audio("{{ asset('sounds/notification.mp3') }}");
-                sound.volume = 0.3; // 30% volume to avoid being annoying
-                sound.play().catch(e => console.log("Sound play prevented:", e));
-            } catch (e) {
-                console.warn("Couldn't play notification sound:", e);
-            }
-        }
-
         function updateNotificationBell() {
             fetch('/notifications/unread-count')
                 .then(res => res.json())

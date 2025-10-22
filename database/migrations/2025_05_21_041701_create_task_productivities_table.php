@@ -29,10 +29,10 @@ return new class extends Migration
             // $table->time('end_time');
             // $table->integer('time_rendered'); // Duration in minutes
 
-            $table->string('file_name')->nullable();
-            $table->string('file_size')->nullable();
-            $table->string('file_type')->nullable();
-            $table->string('file_path')->nullable();
+            // $table->string('file_name')->nullable();
+            // $table->string('file_size')->nullable();
+            // $table->string('file_type')->nullable();
+            // $table->string('file_path')->nullable();
 
             $table->string('status')->default('pending'); // pending, approved, rejected
             $table->text('remarks');

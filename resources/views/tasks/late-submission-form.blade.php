@@ -3,8 +3,9 @@
     <div class="bg-gray-800/70 backdrop-blur-lg shadow-xl rounded-xl p-8 border border-gray-700/30">
       <h2 class="text-2xl font-bold text-white mb-6">Late Resubmission Form</h2>
 
-      <form method="POST" action="{{ route('submissions.late-submission', $task->slug) }}" enctype="multipart/form-data" class="space-y-6">
+      <form method="POST" action="{{ route('submissions.late-submission', $task->id) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
+        @method('PUT')
         
         <!-- Subject Field -->
         <div>
@@ -53,7 +54,7 @@
                   <span>Upload a file</span>
                   <input 
                     type="file" 
-                    name="file" 
+                    name="files[]" 
                     required
                     accept=".doc,.docx,.pdf,.xls,.xlsx,.ppt,.pptx"
                     class="sr-only"

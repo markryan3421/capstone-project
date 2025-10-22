@@ -171,14 +171,7 @@
                 <div class="bg-gray-700 px-5 py-3 flex justify-between items-center">
                     <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold text-white truncate">{{ $task->title }}</h3>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="px-2 py-1 rounded-full text-xs font-medium {{ 
-                                $task->status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
-                                ($task->status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400') 
-                            }}">
-                                {{ ucfirst($task->status) }}
-                            </span>
-                        </div>
+                        
                     </div>
                     @if($task->status === 'pending')
                       @if(now()->timezone(config('app.timezone'))->lt($task->deadline))
@@ -193,20 +186,20 @@
                               </svg>
                               Submit Task
                             </a>
-                            <span class="text-xs text-gray-300 bg-gray-800/30 px-2 py-0.5 rounded">
-                              ⏰ Before {{ $task->deadline->format('M j, g:i A') }}
-                            </span>
+                            <!-- <span class="text-xs text-gray-300 bg-gray-800/30 px-2 py-0.5 rounded">
+                              Before {{ $task->deadline->format('M j, g:i A') }}
+                            </span> -->
                           </div>
                         </div>
                       @else
                         <!-- Resubmission Button (After Deadline) -->
                         <div class="space-y-2">
-                          <div class="flex items-center text-red-300 text-xs bg-red-900/20 px-2 py-1 rounded border border-red-800/30">
+                          <!-- <div class="flex items-center text-red-300 text-xs bg-red-900/20 px-2 py-1 rounded border border-red-800/30">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             Deadline passed
-                          </div>
+                          </div> -->
                           <form action="/request-resubmission/{{ $task->slug }}" method="post">
                             @csrf
                             <button type="submit"
@@ -291,6 +284,10 @@
                         </svg>
                         Resubmission rejected. You can no longer submit task compliance.
                       </div>
+                    @elseif($task->status === 'completed_late')
+                      <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-500/30 border border-gray-700/30 text-green-100 text-xs">
+                        Completed (Late)
+                      </div>
                     @else
                       <!-- Task Completed -->
                       <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-800/30 border border-gray-700/30 text-green-300 text-xs">
@@ -300,6 +297,38 @@
                         Task completed
                       </div>
                     @endif
+                    
+                    @hasrole('admin')
+                    <!-- More Dropdown -->
+                      <div class="hs-dropdown [--strategy:absolute]  relative inline-flex">
+                        <button id="hs-pro-ainmd" type="button" class="flex justify-center items-center gap-x-3 size-9 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200">
+                          <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+
+                        <!-- More Dropdown -->
+                        <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 w-32 transition-[opacity,margin] duration opacity-0 hidden z-11 bg-white border border-gray-200 rounded-xl shadow-lg before:absolute before:-top-4 before:start-0 before:w-full before:h-5 dark:bg-neutral-950 dark:border-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="hs-pro-ainmd">
+                          <div class="p-1 space-y-0.5">
+                            <a href="{{ route('tasks.edit', [$goal->slug, $task->slug]) }}" class="w-full flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-sm text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800">
+                              <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                              Edit
+                            </a>
+
+                            
+                            <form action="{{  route('tasks.delete', [$goal->slug, $task->slug]) }}" method="post">
+                              @csrf
+                              @method('DELETE')
+                            
+                              <button type="submit" onclick="return confirm('Are you sure you want to delete this item?');" class="w-full flex items-center gap-x-3 py-1.5 px-2 rounded-lg text-sm text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-red-50 dark:text-red-500 dark:hover:bg-red-500/20 dark:focus:bg-red-500/20">
+                                <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                Delete
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                        <!-- End More Dropdown -->
+                      </div>
+                    <!-- End More Dropdown -->
+                    @endhasrole
                 </div>
 
                 <!-- Task Body -->
@@ -319,31 +348,60 @@
                           </div>
                           
                           @if($task->deadline)
-                              @php
-                                  $daysLeft = floor(\Carbon\Carbon::parse($task->created_at)->diffInDays($task->deadline)); 
-                                  $startTime = Carbon\Carbon::parse($task->created_at);
-                                  $endTime = Carbon\Carbon::parse($task->deadline);
-                                  $remainingHours = $startTime->diffInHours($endTime);
-                              @endphp
-                              
-                              <p class="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                                  {{ \Carbon\Carbon::parse($task->deadline)->format('M d, Y') }}
-                              </p>
-                              
-                              <div class="flex items-center justify-between mb-2">
-                                  <span class="text-sm font-medium {{ $daysLeft >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                      @if($daysLeft > 0)
-                                        <!-- If more than 1 day left, show the remaining days -->
-                                        {{ round($daysLeft) }} day{{ abs($daysLeft) !== 1 ? 's' : '' }} {{ $daysLeft >= 0 ? 'remaining' : 'overdue' }}
-                                      @else
-                                        <!-- If less than a day left, show the remaining hours -->
-                                        {{ round($remainingHours) }} hour{{ abs($remainingHours) !== 1 ? 's' : '' }} {{ $remainingHours >= 0 ? 'remaining' : 'overdue' }}
-                                      @endif
-                                  </span>
-                              </div>
+                            @php
+                                $today = \Carbon\Carbon::now();
+                                $deadline = \Carbon\Carbon::parse($task->deadline);
+                                
+                                // Calculate time differences correctly
+                                $daysLeft = $today->diffInDays($deadline, false); // false = don't return absolute value
+                                $hoursLeft = $today->diffInHours($deadline, false);
+                                $totalHoursLeft = $today->diffInHours($deadline, false);
+                            @endphp
+                            
+                            <p class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                {{ $deadline->format('M d, Y') }}
+                            </p>
+                            
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium 
+                                    @if($daysLeft > 0) text-green-600 dark:text-green-400
+                                    @elseif($daysLeft == 0 && $hoursLeft > 0) text-yellow-600 dark:text-yellow-400
+                                    @elseif($daysLeft == 0 && $hoursLeft == 0) text-orange-600 dark:text-orange-400
+                                    @else text-red-600 dark:text-red-400 @endif">
+                                    
+                                    @if($daysLeft > 1)
+                                        <!-- More than 1 day remaining -->
+                                        {{ round($daysLeft) }} days remaining
+                                    @elseif($daysLeft == 1)
+                                        <!-- Exactly 1 day remaining -->
+                                        1 day remaining
+                                    @elseif($daysLeft == 0 && $hoursLeft > 12)
+                                        <!-- Less than 1 day but more than 12 hours -->
+                                        {{ $hoursLeft }} hours remaining
+                                    @elseif($daysLeft == 0 && $hoursLeft > 1)
+                                        <!-- Less than 12 hours but more than 1 hour -->
+                                        {{ $hoursLeft }} hours remaining
+                                    @elseif($daysLeft == 0 && $hoursLeft == 1)
+                                        <!-- Exactly 1 hour remaining -->
+                                        1 hour remaining
+                                    @elseif($daysLeft == 0 && $hoursLeft == 0)
+                                        <!-- Exactly at deadline -->
+                                        Due now
+                                    @elseif($daysLeft == 0 && $hoursLeft < 0 && $hoursLeft > -24)
+                                        <!-- Less than 24 hours overdue -->
+                                        {{ abs($hoursLeft) }} hours overdue
+                                    @elseif($daysLeft < 0)
+                                        <!-- More than 24 hours overdue -->
+                                        Deadline passed
+                                    @else
+                                        <!-- Fallback -->
+                                        Deadline passed
+                                    @endif
+                                </span>
+                            </div>
                           @else
-                              <p class="text-lg font-bold text-gray-400 dark:text-gray-500 mb-2">Not set</p>
-                              <p class="text-sm text-gray-500 dark:text-gray-400 italic">No deadline specified</p>
+                            <p class="text-lg font-bold text-gray-400 dark:text-gray-500 mb-2">Not set</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">No deadline specified</p>
                           @endif
                       </div>
 
@@ -410,186 +468,204 @@
                       </div>
                   </div>
                   
-                  <!-- Enhanced Submissions Section -->
+                  <!-- Submissions Section -->
                   <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-                      <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Submissions
-                      </h4>
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <svg class="h-5 w-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Submissions
+                    </h4>
 
-                      @if($task->taskProductivities->count()) 
-                      <div x-data="{ openRejectModalId: null }" class="space-y-4">
-                          @foreach ($task->taskProductivities as $submission)
-                          <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-                              <div class="flex items-start justify-between">
-                                  <div class="flex-1 min-w-0">
-                                      <div class="flex items-center mb-3">
-                                          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold mr-3 shadow-lg">
-                                              {{ strtoupper(substr($submission->user->name ?? 'U', 0, 1)) }}
-                                          </div>
-                                          <div>
-                                              <p class="text-gray-900 dark:text-white font-semibold truncate">{{ $submission->user->name ?? 'Unknown User' }}</p>
-                                              <p class="text-sm text-gray-500 dark:text-gray-400">{{ $submission->created_at->format('M d, Y \\a\\t h:i A') }}</p>
-                                          </div>
-                                      </div>
-                                      
-                                      <!-- Status Display -->
-                                      <div class="mt-3 pl-13">
-                                          @if($submission->status === 'rejected' && $submission->remarks)
-                                          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                                              <p class="text-sm text-red-700 dark:text-red-300 font-medium mb-1 flex items-center">
-                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                  </svg>
-                                                  Rejection Remarks
-                                              </p>
-                                              <p class="text-red-600 dark:text-red-400 text-sm">{{ $submission->remarks }}</p>
-                                          </div>
-                                          @endif
-                                      </div>
-                                  </div>
-                                  
-                                  <div class="flex flex-col sm:flex-row gap-2 ml-4">
-                                      <a href="{{ asset('storage/' . $submission->file_path) }}" 
-                                        target="_blank"
-                                        class="inline-flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium transition-all duration-200 transform hover:-translate-y-0.5">
-                                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                          </svg>
-                                          View File
-                                      </a>
-                                      
-                                      @hasanyrole('admin|project-manager')
-                                          @if($submission->status === 'approved')
-                                              <span class="inline-flex items-center px-3 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-medium rounded-lg border border-green-200 dark:border-green-800">
-                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                  </svg>
-                                                  Approved
-                                              </span>
-                                          @elseif($submission->status === 'rejected')
-                                              <span class="inline-flex items-center px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-medium rounded-lg border border-red-200 dark:border-red-800">
-                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                  </svg>
-                                                  Rejected
-                                              </span>
-                                          @else
-                                              <form action="{{ route('submissions.approve', $submission->id) }}" method="post" class="inline">
-                                                  @csrf
-                                                  <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-green-500/25">
-                                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                      </svg>
-                                                      Approve
-                                                  </button>
-                                              </form>
-                                              
-                                              <button type="button" 
-                                                      class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-red-500/25"
-                                                      @click="openRejectModalId = {{ $submission->id }}">
-                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                  </svg>
-                                                  Reject
-                                              </button>
-                                          @endif
-                                      @endhasanyrole
-                                      
-                                      @if($submission->status === 'rejected')
-                                          <a href="{{ route('submissions.resubmit', $submission->id) }}" 
-                                            class="inline-flex items-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-yellow-500/25">
-                                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                              </svg>
-                                              Resubmit
-                                          </a>
-                                      @endif
-                                  </div>
-                              </div>
-                          </div>
+                    @if($task->taskProductivities->count()) 
+                    <div x-data="{ openRejectModalId: null }" class="space-y-4">
+                        @foreach ($task->taskProductivities as $submission)
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold mr-3 shadow-lg">
+                                            {{ strtoupper(substr($submission->user->name ?? 'U', 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-900 dark:text-white font-semibold truncate">{{ $submission->user->name ?? 'Unknown User' }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $submission->created_at->format('M d, Y \\a\\t h:i A') }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Files Display -->
+                                    @if($submission->taskProductivityFiles->count())
+                                    <div class="mt-4 pl-13">
+                                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Submitted Files
+                                        </p>
+                                        <div class="grid gap-2 max-w-2xl">
+                                            @foreach($submission->taskProductivityFiles as $file)
+                                            <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-700 transition-colors duration-200">
+                                                <div class="flex items-center min-w-0 flex-1">
+                                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ $file->file_name }}</span>
+                                                </div>
+                                                <a href="{{ asset('storage/'.$file->file_path) }}" 
+                                                  target="_self" 
+                                                  class="inline-flex items-center px-2.5 py-1.5 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-200 dark:border-blue-800 transition-colors duration-200 ml-2 flex-shrink-0">
+                                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                    Open
+                                                </a>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
+                                    
+                                    <!-- Status Display -->
+                                    @if($submission->status === 'rejected' && $submission->remarks)
+                                    <div class="mt-4 pl-13">
+                                        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                                            <p class="text-sm text-red-700 dark:text-red-300 font-medium mb-1 flex items-center">
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Rejection Remarks
+                                            </p>
+                                            <p class="text-red-600 dark:text-red-400 text-sm">{{ $submission->remarks }}</p>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex flex-col sm:flex-row gap-2 ml-4 flex-shrink-0">
+                                    @hasanyrole('admin|project-manager')
+                                        @if($submission->status === 'approved')
+                                            <span class="inline-flex items-center px-3 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-medium rounded-lg border border-green-200 dark:border-green-800">
+                                                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Approved
+                                            </span>
+                                        @elseif($submission->status === 'rejected')
+                                            <span class="inline-flex items-center px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-medium rounded-lg border border-red-200 dark:border-red-800">
+                                                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Rejected
+                                            </span>
+                                        @else
+                                            <form action="{{ route('submissions.approve', $submission->id) }}" method="post" class="inline">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-green-500/25">
+                                                    <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Approve
+                                                </button>
+                                            </form>
+                                            
+                                            <button type="button" 
+                                                    class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-red-500/25"
+                                                    @click="openRejectModalId = {{ $submission->id }}">
+                                                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Reject
+                                            </button>
+                                        @endif
+                                    @endhasanyrole
+                                    
+                                    @if($submission->status === 'rejected')
+                                        <a href="{{ route('submissions.resubmit', $submission->id) }}" 
+                                          class="inline-flex items-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-yellow-500/25">
+                                            <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            Resubmit
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
 
-                          <!-- Enhanced Rejection Modal -->
-                          <div x-show="openRejectModalId === {{ $submission->id }}" 
-                              x-transition:enter="ease-out duration-300"
-                              x-transition:enter-start="opacity-0"
-                              x-transition:enter-end="opacity-100"
-                              x-transition:leave="ease-in duration-200"
-                              x-transition:leave-start="opacity-100"
-                              x-transition:leave-end="opacity-0"
-                              class="fixed inset-0 z-50 overflow-y-auto" 
-                              x-cloak>
-                              <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                  <!-- Background overlay -->
-                                  <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="openRejectModalId = null"></div>
+                        <!-- Rejection Modal -->
+                        <div x-show="openRejectModalId === {{ $submission->id }}" 
+                            x-transition:enter="ease-out duration-300"
+                            x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100"
+                            x-transition:leave="ease-in duration-200"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                            class="fixed inset-0 z-50 overflow-y-auto" 
+                            x-cloak>
+                            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="openRejectModalId = null"></div>
 
-                                  <!-- Modal panel -->
-                                  <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-200 dark:border-gray-700">
-                                      <div class="px-6 py-5 sm:p-6">
-                                          <!-- Modal Header -->
-                                          <div class="flex items-center justify-between mb-5">
-                                              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Reject Submission</h3>
-                                              <button @click="openRejectModalId = null" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                  </svg>
-                                              </button>
-                                          </div>
+                                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-200 dark:border-gray-700">
+                                    <div class="px-6 py-5 sm:p-6">
+                                        <div class="flex items-center justify-between mb-5">
+                                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Reject Submission</h3>
+                                            <button @click="openRejectModalId = null" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
 
-                                          <!-- Modal Body -->
-                                          <form method="POST" action="{{ route('submissions.reject', $submission->id) }}" class="space-y-4">
-                                              @csrf
-                                              <div>
-                                                  <label for="remarks-{{ $submission->id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Remarks *</label>
-                                                  <textarea 
-                                                      name="remarks" 
-                                                      id="remarks-{{ $submission->id }}" 
-                                                      rows="4" 
-                                                      required
-                                                      placeholder="Please provide specific feedback on why this submission is being rejected and what improvements are needed..."
-                                                      class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition resize-none"
-                                                  ></textarea>
-                                              </div>
+                                        <form method="POST" action="{{ route('submissions.reject', $submission->id) }}" class="space-y-4">
+                                            @csrf
+                                            <div>
+                                                <label for="remarks-{{ $submission->id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Remarks *</label>
+                                                <textarea 
+                                                    name="remarks" 
+                                                    id="remarks-{{ $submission->id }}" 
+                                                    rows="4" 
+                                                    required
+                                                    placeholder="Please provide specific feedback on why this submission is being rejected and what improvements are needed..."
+                                                    class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition resize-none"
+                                                ></textarea>
+                                            </div>
 
-                                              <!-- Modal Footer -->
-                                              <div class="flex justify-end space-x-3 pt-4">
-                                                  <button 
-                                                      type="button" 
-                                                      @click="openRejectModalId = null" 
-                                                      class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 transition-all duration-200 font-medium"
-                                                  >
-                                                      Cancel
-                                                  </button>
-                                                  <button 
-                                                      type="submit" 
-                                                      class="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-all duration-200 font-medium flex items-center shadow-lg hover:shadow-red-500/25 transform hover:-translate-y-0.5"
-                                                  >
-                                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                      </svg>
-                                                      Reject Submission
-                                                  </button>
-                                              </div>
-                                          </form>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          @endforeach
-                      </div>
-                      @else
-                      <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                          </svg>
-                          <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Submissions Yet</h4>
-                          <p class="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto">Be the first to submit your work for this task. Click the submit button above to get started.</p>
-                      </div>
-                      @endif
-                  </div>
+                                            <div class="flex justify-end space-x-3 pt-4">
+                                                <button 
+                                                    type="button" 
+                                                    @click="openRejectModalId = null" 
+                                                    class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 transition-all duration-200 font-medium"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    type="submit" 
+                                                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-all duration-200 font-medium flex items-center shadow-lg hover:shadow-red-500/25"
+                                                >
+                                                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    Reject Submission
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+                        <svg class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        </svg>
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Submissions Yet</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto">Be the first to submit your work for this task.</p>
+                    </div>
+                    @endif
+                </div>
               </div>
             </div>
             @endforeach
@@ -687,4 +763,12 @@
       </div>
     </div>
   </div>
+  <!-- Modal -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.hs-overlay').forEach((el) => HSOverlay.open(el));
+      });
+    });
+  </script>
 </x-layout>

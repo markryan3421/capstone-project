@@ -6,51 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SDG Dashboard</title>
     <link rel="icon" href="logo.png" type="image/png"> 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <!-- Keep your extra CSS libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" />
+
     <style>
         [x-cloak] { display: none !important; }
-        .sidebar-link {
-            transition: all 0.2s ease;
-        }
-        .sidebar-link:hover {
-            transform: translateX(3px);
-        }
-        .floating-shape {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 15s infinite ease-in-out;
-        }
-        .rotating-circle {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            animation: spin 20s linear infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
     </style>
-    
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/js/tom-select.complete.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
-    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans antialiased relative">
     <!-- Background Particles and Decorative Elements -->
     <div class="absolute top-0 left-0 right-0 h-[400px] overflow-hidden z-0">
@@ -67,37 +33,6 @@
             <div class="rotating-circle" style="top: 40%; left: 30%;"></div>
         </div>
     </div>
-
-    <script>
-        tsParticles.load("tsparticles", {
-            fullScreen: { enable: false },
-            background: { color: "transparent" },
-            particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: "#ffffff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-                move: {
-                    enable: true,
-                    speed: 1.5,
-                    direction: "none",
-                    random: true,
-                    straight: false,
-                    out_mode: "bounce",
-                    bounce: true
-                }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "grab" },
-                    onclick: { enable: true, mode: "push" }
-                }
-            }
-        });
-    </script>
 
     <!-- Sidebar Toggle Button -->
     <button
@@ -368,5 +303,7 @@
             }, 5000);
         }
         </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
 </body>
 </html>

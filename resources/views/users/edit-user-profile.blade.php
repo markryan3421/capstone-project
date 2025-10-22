@@ -159,10 +159,10 @@
                       class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-blue-500/25">
                 Update Profile
               </button>
-              <button type="button" 
+              <a href="/profile/{{ $user->user_slug }}"
                       class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                 Cancel
-              </button>
+              </a>
             </div>
           </div>
           <!-- End Card Container -->

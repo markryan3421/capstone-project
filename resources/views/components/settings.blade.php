@@ -142,8 +142,8 @@
 
     <!-- Page Header -->
     <div class="mb-10 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-3">Settings Center</h1>
-      <p class="text-lg text-gray-400 max-w-2xl mx-auto">Manage your application's users, roles, and system configurations</p>
+      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-5">Settings Center</h1>
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto mt-5">Manage your application's users, roles, and system configurations</p>
     </div>
 
     <!-- Navigation Tabs -->
@@ -173,6 +173,17 @@
             </a>
           </li>
         @endhasrole
+        <li>
+            <a href="{{ route('settings.others.index') }}" 
+              class="nav-tab {{ request()->routeIs('settings.others.*') ? 'active' : '' }}"
+              aria-current="{{ request()->routeIs('settings.others.*') ? 'page' : 'false' }}"
+            >
+              <span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-adjustments-alt"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8h4v4h-4z" /><path d="M6 4l0 4" /><path d="M6 12l0 8" /><path d="M10 14h4v4h-4z" /><path d="M12 4l0 10" /><path d="M12 18l0 2" /><path d="M16 5h4v4h-4z" /><path d="M18 4l0 1" /><path d="M18 9l0 11" /></svg>
+                Others
+              </span>
+            </a>
+          </li>
       </ul>
     </nav>
 
@@ -275,7 +286,7 @@
             }
         }, 5000);
     }
-    </script>
+  </script>
 
   <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>

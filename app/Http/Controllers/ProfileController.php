@@ -54,7 +54,7 @@ class ProfileController extends Controller
 
         $user->update($incomingFields);
 
-        return redirect("profile/{{ $user->user_slug }}")
+        return redirect("profile/$user->user_slug")
                          ->with('success', 'Profile updated successfully.');
 
     }

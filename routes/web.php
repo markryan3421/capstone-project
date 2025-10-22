@@ -48,6 +48,8 @@ Route::middleware('auth')->prefix('settings')->name('settings.')->group(function
   Route::put('/users/{user:user_slug}', [UserController::class, 'update']);
   Route::put('/users/{user:user_slug}/assign-role', [UserController::class, 'assignRole']);
   Route::delete('/users/{user:user_slug}/delete', [UserController::class, 'destroy']);
+
+  Route::get('/others', [SettingsController::class, 'index'])->name('others.index');
 });
 
 // Change / Switch Tenant
@@ -74,7 +76,7 @@ Route::middleware('auth')->prefix('goals/{goal:slug}/tasks')->name('tasks.')->gr
   // Route::get('/show/{task:slug}', [GoalController::class, 'showTask'])->name('show');
   Route::get('/{task:slug}/edit', [TaskController::class, 'edit'])->name('edit');
   Route::put('/{task:slug}/update', [TaskController::class, 'update'])->name('update');
-  // Route::delete('/delete/{task:slug}', [GoalController::class, 'destroyTask']);
+  Route::delete('/delete/{task:slug}', [TaskController::class, 'delete'])->name('delete');
 });
 
 // Task Submission Related Routes
@@ -94,7 +96,7 @@ Route::middleware('auth')->group(function() {
   Route::post('/tasks/{task:slug}/approve-resubmission', [TaskProductivityController::class, 'approveResubmissionRequest'])->name('tasks.approve-resubmission');
   Route::post('tasks/{task:slug}/reject-resubmission', [TaskProductivityController::class, 'rejectResubmissionRequest']);
   Route::get('/tasks/{task:slug}/resubmit', [TaskProductivityController::class, 'lateSubmissionForm'])->name('submissions.late-form');
-  Route::put('/tasks/{task:slug}/resubmit-file', [TaskProductivityController::class, 'lateResubmission'])->name('submissions.late-submission');
+  Route::put('/tasks/{task:id}/resubmit-file', [TaskProductivityController::class, 'lateResubmission'])->name('submissions.late-submission');
 });
 
 // Report Routes
