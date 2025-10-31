@@ -18,6 +18,12 @@ class TaskProductivityController extends Controller
 {
     use GoalProgressUpdater;
 
+    public function rejectForm($id) {
+        $submission = TaskProductivity::findOrFail($id);
+
+        return view('tasks.reject-submission-form', compact('submission'));
+    }
+
     // Approved late resubmission
     public function lateResubmission(Request $request, Task $task) {
         $goal = $task->goal;
@@ -115,7 +121,16 @@ class TaskProductivityController extends Controller
     }
 
     // approve resubmission request
-    public function approveResubmissionRequest(Task $task) {
+    public function approveResubmissionRequest(Request $request, Task $task) {
+        $incomingFields = $request->validate([
+            'deadline' => 'required|date|after_or_equal:today',
+        ]);
+
+        // update the deadline
+        $task->update([
+            'deadline' => $incomingFields['deadline'],
+        ]);
+
         // Update the task status to 'approved'
         $task->status = 'approved_resubmission';
         $task->save();
@@ -165,10 +180,11 @@ class TaskProductivityController extends Controller
         return back()->with('success', 'Resubmission request sent successfully.');
     }
 
-    public function resubmitForm($id) {
+    public function resubmitForm(Task $task, $id) {
         $productivity = TaskProductivity::findOrFail($id);
+        $submission = $productivity;
 
-        return view('tasks.resubmit-task', compact('productivity'));
+        return view('tasks.resubmit-task', compact('productivity', 'task', 'submission'));
     }
 
     public function reject(Request $request, TaskProductivity $submission) {
@@ -237,7 +253,7 @@ class TaskProductivityController extends Controller
         return view('tasks.submit-task', compact('task'));
     }
 
-    public function resubmit(Request $request, TaskProductivity $productivity) {
+    public function resubmit(Request $request, Task $task, TaskProductivity $productivity) {
         // Validate incoming data from the resubmit form
         $incomingFields = $request->validate([
             'subject' => 'required|string|max:255',
@@ -246,15 +262,15 @@ class TaskProductivityController extends Controller
             'files.*' => 'file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
-        $productivity->updateOrCreate(
+        $updatedSubmission = TaskProductivity::updateOrCreate(
             [
-                'task_id' => $productivity->task->id,
+                'task_id' => $task->id,
                 'user_id' => Auth::id(),
                 'updated_at' => now()->toDateString(),
             ],
             [
-                'sdg_id' => $productivity->task->sdg_id,
-                'goal_id' => $productivity->task->goal_id,
+                'sdg_id' => $task->sdg_id,
+                'goal_id' => $task->goal_id,
                 'subject' => $incomingFields['subject'],
                 'comments' => $incomingFields['comments'],
                 'status' => 'pending',
@@ -266,7 +282,7 @@ class TaskProductivityController extends Controller
         foreach($incomingFields['files'] as $file) {
             $filePath = $file->store('task_productivities', 'public');
 
-            $productivity->taskProductivityFiles()->updateOrCreate([
+            $updatedSubmission->taskProductivityFiles()->updateOrCreate([
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
                 'file_type' => $file->getClientMimeType(),
@@ -274,10 +290,11 @@ class TaskProductivityController extends Controller
             ]);
         }
 
-        // Update goal progress after resubmission
-        $this->updateGoalProgress($productivity->task->goal);
 
-        $goal = $productivity->task->goal;
+        // Update goal progress after resubmission
+        $this->updateGoalProgress($updatedSubmission->task->goal);
+
+        $goal = $task->goal;
         // Send notification
         $goal->load('projectManager');
         $sender = Auth::user(); // The staff submitting that task
@@ -285,7 +302,7 @@ class TaskProductivityController extends Controller
         // Check if the project manager exists
         if($goal->projectManager) {
             $goal->projectManager->notify(new TaskStatusNotification(
-                "{$sender->name} resubmitted a task for {$goal->task->title}.",
+                "{$sender->name} resubmitted a task for {$task->title}.",
                 "Go check it out.",
                 route('goals.show', ['goal' => $goal->slug]),
                 $goal->id,
@@ -294,7 +311,7 @@ class TaskProductivityController extends Controller
             ));
         }
 
-        return redirect('/')->with('success', 'Task submitted successfully.');
+        return redirect("/goals/show/$goal->slug")->with('success', 'Task submitted successfully.');
     }
 
     /**

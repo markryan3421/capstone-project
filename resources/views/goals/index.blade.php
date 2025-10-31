@@ -137,60 +137,115 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div class="bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
+        <div class="bg-gradient-to-br from-blue-600/20 to-blue-700/30 rounded-2xl shadow-xl p-6 flex justify-between items-center border border-blue-500/20 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
             <div>
-                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'short')->count() }}</div>
-                <div class="text-sm text-blue-200">Total Short Term Goals</div>
+                <div class="text-4xl font-bold text-white mb-2">{{ $goals->where('type', 'short')->count() }}</div>
+                <div class="text-blue-200 font-medium">Short Term Goals</div>
+                <div class="text-xs text-blue-300/80 mt-1">Active objectives</div>
             </div>
-            <div class="p-3 rounded-full bg-blue-700 bg-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <div class="p-4 rounded-2xl bg-blue-500/20 border border-blue-400/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl shadow-lg p-6 flex justify-between items-center">
+        
+        <div class="bg-gradient-to-br from-purple-600/20 to-purple-700/30 rounded-2xl shadow-xl p-6 flex justify-between items-center border border-purple-500/20 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
             <div>
-                <div class="text-3xl font-bold text-white">{{ $goals->where('type', 'long')->count() }}</div>
-                <div class="text-sm text-purple-200">Total Long Term Goals</div>
+                <div class="text-4xl font-bold text-white mb-2">{{ $goals->where('type', 'long')->count() }}</div>
+                <div class="text-purple-200 font-medium">Long Term Goals</div>
+                <div class="text-xs text-purple-300/80 mt-1">Strategic initiatives</div>
             </div>
-            <div class="p-3 rounded-full bg-purple-700 bg-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <div class="p-4 rounded-2xl bg-purple-500/20 border border-purple-400/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
         <!-- Compliance Chart - 75% width -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg lg:col-span-3" width="500px" height="100%">
-            <div class="flex justify-between items-center mb-6"> <!-- Increased mb-4 to mb-6 -->
-                <h3 class="text-xl font-semibold text-white">Compliance Overview</h3>
-                <div class="flex space-x-4">
-                    <span class="flex items-center text-sm text-gray-400">
+        <div class="bg-gray-800 rounded-2xl shadow-xl p-6 lg:col-span-3 border border-gray-700/50 flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h3 class="text-xl font-bold text-white">Goals Compliance Overview</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="flex items-center text-sm text-gray-300">
                         <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Total
                     </span>
-                    <span class="flex items-center text-sm text-gray-400">
+                    <span class="flex items-center text-sm text-gray-300">
                         <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span> Compliant
                     </span>
-                    <span class="flex items-center text-sm text-gray-400">
+                    <span class="flex items-center text-sm text-gray-300">
                         <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span> Non-Compliant
                     </span>
                 </div>
             </div>
             
-            <div> <!-- Increased height from h-80 to h-[400px] -->
-                <!-- <canvas id="complianceChart" width="400" height="100"></canvas> -->
-                <canvas id="complianceChart" width="200" height="200"></canvas>
+            <!-- Chart Container that fills available space -->
+            <div class="flex-1 min-h-0"> <!-- This makes the chart container flexible -->
+                <canvas id="complianceChart"></canvas>
+            </div>
+            
+            <!-- Stats below chart -->
+            <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-700/50">
+                <div class="text-center">
+                    <div class="text-xl font-bold text-blue-400">{{ $totalGoals }}</div>
+                    <div class="text-xs text-gray-400">Total Goals</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xl font-bold text-green-400">{{ $compliantGoals }}</div>
+                    <div class="text-xs text-gray-400">Compliant</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ $totalGoals > 0 ? number_format(($compliantGoals / $totalGoals) * 100, 1) : 0 }}%
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xl font-bold text-red-400">{{ $nonCompliantGoals }}</div>
+                    <div class="text-xs text-gray-400">Non-Compliant</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ $totalGoals > 0 ? number_format(($nonCompliantGoals / $totalGoals) * 100, 1) : 0 }}%
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Goals Distribution Chart - 25% width -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg lg:col-span-1">
-            <h3 class="text-xl font-semibold text-white mb-8">Goals Distribution</h3> <!-- Increased mb-6 to mb-8 -->
-            <div width="500"> 
+        <div class="bg-gray-800 rounded-2xl shadow-xl p-6 lg:col-span-1 border border-gray-700/50 flex flex-col">
+            <div class="text-center mb-4">
+                <h3 class="text-lg font-bold text-white mb-2">Goals Distribution</h3>
+                <div class="flex justify-center space-x-3">
+                    <span class="flex items-center text-xs text-gray-300">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 mr-1"></span> Short
+                    </span>
+                    <span class="flex items-center text-xs text-gray-300">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 mr-1"></span> Long
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Chart Container that fills available space -->
+            <div class="flex-1 min-h-0 relative"> <!-- This makes the chart container flexible -->
                 <canvas id="distributionChart"></canvas>
+            </div>
+            
+            <!-- Stats below chart -->
+            <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-700/50">
+                <div class="text-center">
+                    <div class="text-lg font-bold text-indigo-400">{{ $goals->where('type', 'short')->count() }}</div>
+                    <div class="text-xs text-gray-400">Short</div>
+                    <div class="text-xs text-gray-500">
+                        {{ $totalGoals > 0 ? number_format(($goals->where('type', 'short')->count() / $totalGoals) * 100, 1) : 0 }}%
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-bold text-purple-400">{{ $goals->where('type', 'long')->count() }}</div>
+                    <div class="text-xs text-gray-400">Long</div>
+                    <div class="text-xs text-gray-500">
+                        {{ $totalGoals > 0 ? number_format(($goals->where('type', 'long')->count() / $totalGoals) * 100, 1) : 0 }}%
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -298,6 +353,12 @@
     </script>
 
     <script>
+        // Initialize notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            initPrivateNotification();
+            updateNotificationBell();
+        });
+        
         function updateNotificationBell() {
             fetch('/notifications/unread-count')
                 .then(res => res.json())

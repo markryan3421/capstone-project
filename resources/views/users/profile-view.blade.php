@@ -75,6 +75,15 @@
                         </div>
                     </div>
 
+                    <button id="enable-sounds" class="sound-toggle-btn" aria-label="Toggle notification sounds">
+                        <span class="sound-icon">🔔</span>
+                        <span class="sound-text">Enable Sounds</span>
+                    </button>
+
+                    <audio id="notification-sound" preload="auto" 
+                        src="{{ asset('sounds/notification.mp3') }}">
+                    </audio>
+
                     <!-- Content Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         
@@ -188,4 +197,83 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let notificationSound;
+        let soundToggle;
+        // Initialize notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            soundToggle = document.getElementById('enable-sounds');
+            notificationSound = document.getElementById('notification-sound');
+            notificationSound.volume = 0.3;
+
+            updateButtonState();
+
+            soundToggle.addEventListener('click', toggleSound);
+        });
+
+        function toggleSound() {
+            const isEnabled = localStorage.getItem('soundsEnabled') === 'true';
+            
+            // Immediately toggle state (don't wait for playback test)
+            localStorage.setItem('soundsEnabled', !isEnabled);
+            updateButtonState();
+
+            // Only test playback if enabling (not disabling)
+            if (!isEnabled) {
+                testAudioPlayback();
+            }
+        }
+
+        function testAudioPlayback() {
+            notificationSound.currentTime = 0;
+            notificationSound.play()
+                .then(() => {
+                notificationSound.pause();
+                notificationSound.currentTime = 0;
+                })
+                .catch(e => {
+                console.error("Audio blocked:", e);
+                localStorage.setItem('soundsEnabled', 'false');
+                updateButtonState();
+                showPermissionAlert();
+                });
+        }
+
+        function updateButtonState() {
+            const isEnabled = localStorage.getItem('soundsEnabled') === 'true';
+            soundToggle.querySelector('.sound-icon').textContent = isEnabled ? '🔊' : '🔔';
+            soundToggle.querySelector('.sound-text').textContent = isEnabled ? 'Disable Sounds' : 'Enable Sounds';
+            soundToggle.classList.toggle('enabled', isEnabled);
+        }
+
+        function showPermissionAlert() {
+            soundToggle.classList.add('error');
+            setTimeout(() => soundToggle.classList.remove('error'), 1000);
+        }
+
+        // Global function - now can access notificationSound
+        window.playNotificationSound = () => {
+            if (localStorage.getItem('soundsEnabled') === 'true') {
+                notificationSound.currentTime = 0;
+                notificationSound.play()
+                .catch(e => {
+                    console.error("Playback failed:", e);
+                    // Don't disable sounds automatically - just show error
+                    soundToggle.classList.add('error');
+                    setTimeout(() => soundToggle.classList.remove('error'), 1000);
+                });
+            }
+        };
+
+        function playNotificationSound() {
+            try {
+                const sound = new Audio("{{ asset('sounds/notification.mp3') }}");
+                sound.volume = 0.3; // 30% volume to avoid being annoying
+                sound.play().catch(e => console.log("Sound play prevented:", e));
+            } catch (e) {
+                console.warn("Couldn't play notification sound:", e);
+            }
+        }
+    </script>
 </x-layout>

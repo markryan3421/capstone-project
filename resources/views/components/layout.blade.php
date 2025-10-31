@@ -10,13 +10,11 @@
     <!-- Keep your extra CSS libraries -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" />
-
     <style>
         [x-cloak] { display: none !important; }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans antialiased relative">
     <!-- Background Particles and Decorative Elements -->
     <div class="absolute top-0 left-0 right-0 h-[400px] overflow-hidden z-0">
@@ -204,7 +202,9 @@
             :class="{ 'ml-0': !sidebarOpen, 'md:ml-72': sidebarOpen }"
         >
             <!-- Toast Container -->
-            <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm w-full"></div>
+            <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-3 max-w-sm w-full" style="position: fixed; top: 20px; right: 20px;"></div>
+            <!-- <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-3 max-w-sm w-full"></div> -->
+            <!-- <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm w-full"></div> -->
 
             <!-- Page Content -->
             <div x-data="{ showTaskModal: false }" class="{{ $attributes->get('class') }}">
@@ -302,8 +302,6 @@
                 }
             }, 5000);
         }
-        </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    </script>
 </body>
 </html>

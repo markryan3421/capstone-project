@@ -15,6 +15,10 @@ class TaskController extends Controller
 {
     use GoalProgressUpdater;
 
+    public function addTask(Goal $goal) {
+        return view('tasks.add-task', compact('goal'));
+    }
+
     public function allTask() {
         $goalsWithTasks = Goal::with('tasks')->latest()->get();
 
@@ -92,7 +96,7 @@ class TaskController extends Controller
             ));
         }
     
-        return back()->with('success', 'Task created successfully.');
+        return redirect("/goals/show/$goal->slug")->with('success', 'Task created successfully.');
     }
 
     /**

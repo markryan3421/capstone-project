@@ -35,7 +35,7 @@ class LoginController extends Controller
             // Redirect back to homepage
             return redirect('/sdgs')->with(['success' => 'You are now logged in!']);
         } else {
-            return redirect('/')->with(['failure' => 'Invalid credentials']);
+            return redirect('/')->with(['error' => 'Invalid credentials']);
         }
     }
 

@@ -16,9 +16,13 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-body {
-    background-color: #0f172a;
-    color: #f8fafc;
+  body {
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    
+  html {
+    scroll-behavior: smooth;
   }
   
   /* Tabs */

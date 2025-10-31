@@ -72,8 +72,8 @@ Route::middleware('auth')->prefix('goals')->name('goals.')->group(function () {
 
 // Task Related Routes
 Route::middleware('auth')->prefix('goals/{goal:slug}/tasks')->name('tasks.')->group(function () {
+  Route::get('/tasks/add-task', [TaskController::class, 'addTask'])->name('add-task');
   Route::post('/create', [TaskController::class, 'store'])->name('store');
-  // Route::get('/show/{task:slug}', [GoalController::class, 'showTask'])->name('show');
   Route::get('/{task:slug}/edit', [TaskController::class, 'edit'])->name('edit');
   Route::put('/{task:slug}/update', [TaskController::class, 'update'])->name('update');
   Route::delete('/delete/{task:slug}', [TaskController::class, 'delete'])->name('delete');
@@ -89,11 +89,12 @@ Route::middleware('auth')->group(function() {
 // Validate Task Submitted
 Route::middleware('auth')->group(function() {
   Route::post('/submissions/{submission:id}/approve', [TaskProductivityController::class, 'approve'])->name('submissions.approve');
+  Route::get('/submissions/{submission:id}/reject-form', [TaskProductivityController::class, 'rejectForm'])->name('submissions.reject-form');
   Route::post('/submissions/{submission:id}/reject', [TaskProductivityController::class, 'reject'])->name('submissions.reject');
-  Route::get('/submissions/{submission:id}/resubmit', [TaskProductivityController::class, 'resubmitForm'])->name('submissions.resubmit');
-  Route::put('/submissions/{productivity:id}/resubmit', [TaskProductivityController::class, 'resubmit'])->name('submissions.resubmit');
+  Route::get('/tasks/{task:slug}/submissions/{submission:id}/resubmit', [TaskProductivityController::class, 'resubmitForm'])->name('submissions.resubmit-form');
+  Route::put('/tasks/{task:slug}/submissions/{submission:id}/', [TaskProductivityController::class, 'resubmit'])->name('submissions.resubmit');
   Route::post('/request-resubmission/{task:slug}', [TaskProductivityController::class, 'requestResubmission'])->name('submissions.request-resubmission');
-  Route::post('/tasks/{task:slug}/approve-resubmission', [TaskProductivityController::class, 'approveResubmissionRequest'])->name('tasks.approve-resubmission');
+  Route::put('/tasks/{task:slug}/approve-resubmission', [TaskProductivityController::class, 'approveResubmissionRequest'])->name('tasks.approve-resubmission');
   Route::post('tasks/{task:slug}/reject-resubmission', [TaskProductivityController::class, 'rejectResubmissionRequest']);
   Route::get('/tasks/{task:slug}/resubmit', [TaskProductivityController::class, 'lateSubmissionForm'])->name('submissions.late-form');
   Route::put('/tasks/{task:id}/resubmit-file', [TaskProductivityController::class, 'lateResubmission'])->name('submissions.late-submission');

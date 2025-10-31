@@ -1,29 +1,5 @@
 <x-layout class="bg-gray-900 min-h-screen text-gray-100">
-  <!-- Alpine.js Data Scope -->
-  <div x-data="{
-      showTaskModal: false,
-      showSubmitModal: false,
-      currentTaskSlug: '',
-      currentTaskTitle: '',
-      
-      openTaskModal() {
-        this.showTaskModal = true;
-      },
-      
-      closeTaskModal() {
-        this.showTaskModal = false;
-      },
-      
-      openSubmitModal(slug, title) {
-        this.currentTaskSlug = slug;
-        this.currentTaskTitle = title;
-        this.showSubmitModal = true;
-      },
-      
-      closeSubmitModal() {
-        this.showSubmitModal = false;
-      }
-    }" class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     
     <!-- Single Column Layout -->
     <div class="space-y-8">
@@ -145,34 +121,35 @@
         @endif
       </div>
 
-      <!-- Tasks/Phases Section - Now moved below -->
+      <!-- Tasks/Phases Section -->
       <div class="bg-gray-800 rounded-xl shadow-lg p-6">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-white">Tasks / Phases</h2>
 
           @hasanyrole('admin|project-manager')
-          <button 
-            @click="openTaskModal()" 
+          <a 
+            href="{{ route('tasks.add-task', [$goal->slug]) }}"
             class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
             Add Task
-          </button>
+          </a>
           @endhasanyrole
         </div>
         
         @if($goal->tasks->count() > 0)
           <div class="space-y-4">
             @foreach ($goal->tasks as $task)
-            <div class="bg-gray-750 rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
+            <!-- Task Box -->
+            <div id="task-{{$task->slug}}" class="bg-gray-750 rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
                 <!-- Task Header -->
                 <div class="bg-gray-700 px-5 py-3 flex justify-between items-center">
                     <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold text-white truncate">{{ $task->title }}</h3>
-                        
                     </div>
+                    
                     @if($task->status === 'pending')
                       @if(now()->timezone(config('app.timezone'))->lt($task->deadline))
                         <!-- Submit Button (Before Deadline) -->
@@ -186,20 +163,11 @@
                               </svg>
                               Submit Task
                             </a>
-                            <!-- <span class="text-xs text-gray-300 bg-gray-800/30 px-2 py-0.5 rounded">
-                              Before {{ $task->deadline->format('M j, g:i A') }}
-                            </span> -->
                           </div>
                         </div>
                       @else
                         <!-- Resubmission Button (After Deadline) -->
                         <div class="space-y-2">
-                          <!-- <div class="flex items-center text-red-300 text-xs bg-red-900/20 px-2 py-1 rounded border border-red-800/30">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Deadline passed
-                          </div> -->
                           <form action="/request-resubmission/{{ $task->slug }}" method="post">
                             @csrf
                             <button type="submit"
@@ -227,15 +195,124 @@
                           
                           <div class="flex space-x-2">
                             <!-- Approve resubmission -->
-                            <form action="/tasks/{{ $task->slug }}/approve-resubmission" method="post">
-                              @csrf
-                              <button type="submit" class="flex items-center px-2.5 py-1 bg-green-700 hover:bg-green-600 rounded text-white text-xs transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Approve
-                              </button>
-                            </form>
+                            <button command="show-modal" commandfor="dialog" class="flex items-center px-2.5 py-1 bg-green-700 hover:bg-green-600 rounded text-white text-xs transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                              </svg>
+                              Approve
+                            </button>
+                            <el-dialog>
+                              <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+                                  <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
+                                  <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
+                                    <el-dialog-panel class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl border border-gray-200 dark:border-gray-700 transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-md data-closed:sm:translate-y-0 data-closed:sm:scale-95">
+                                        <!-- Header -->
+                                      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                                          <div class="flex items-center">
+                                              <div class="flex-shrink-0">
+                                                  <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                                      <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                      </svg>
+                                                  </div>
+                                              </div>
+                                              <div class="ml-4">
+                                                  <h3 id="dialog-title" class="text-xl font-bold text-gray-900 dark:text-white">Extend Task Deadline</h3>
+                                                  <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Grant additional time for task completion</p>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                      <!-- Content -->
+                                      <div class="px-6 py-5 space-y-5">
+                                          <!-- Task Information -->
+                                          <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                                              <div class="flex items-center justify-between">
+                                                  <div class="flex-1">
+                                                      <h4 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">Task Deadline Extension</h4>
+                                                      <div class="flex items-center space-x-4 text-xs text-gray-600 dark:text-gray-400">
+                                                          <span class="flex items-center">
+                                                              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                              </svg>
+                                                              {{ $task->deadline->format('M d, Y') }}
+                                                          </span>
+                                                          <span class="flex items-center">
+                                                              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                              </svg>
+                                                              {{ floor(\Carbon\Carbon::parse($task->deadline)->diffInDays(now())) }} 
+                                                              days overdue
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                                  <!-- <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800">
+                                                      Overdue
+                                                  </span> -->
+                                              </div>
+                                          </div>
+
+                                          <!-- Extension Form -->
+                                          <form class="space-y-4" action="/tasks/{{ $task->slug }}/approve-resubmission" method="post">
+                                              @csrf
+                                              @method('PUT')
+                                              <!-- New Deadline Date -->
+                                              <div>
+                                                  <label for="new-deadline" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                      New Deadline Date *
+                                                  </label>
+                                                  <div class="relative">
+                                                      <input type="date" 
+                                                            id="new-deadline"
+                                                            name="deadline"
+                                                            required
+                                                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10">
+                                                      <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                          </svg>
+                                                      </div>
+                                                  </div>
+                                                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center">
+                                                      <svg class="w-3 h-3 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                      </svg>
+                                                      Select a future date to extend the deadline
+                                                  </p>
+                                              </div>
+                                            </div>
+
+                                            <!-- Footer -->
+                                            <div class="bg-gray-50 dark:bg-gray-700/25 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                                                <div class="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 text-center sm:text-left">
+                                                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        This action will update the task timeline
+                                                    </p>
+                                                    <div class="flex flex-col sm:flex-row gap-3">
+                                                        <button type="button" 
+                                                                command="close" 
+                                                                commandfor="dialog"
+                                                                class="inline-flex justify-center items-center px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 order-2 sm:order-1">
+                                                            Cancel
+                                                        </button>
+                                                        <button type="submit"
+                                                                class="inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 shadow-sm hover:shadow-md order-1 sm:order-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                                </svg>  
+                                                            Approve & Extend Deadline
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                          </form>
+                                    </el-dialog-panel>
+                                  </div>
+                              </dialog>
+                          </el-dialog>
 
                             <!-- Reject resubmission -->
                             <form action="/tasks/{{ $task->slug }}/reject-resubmission" method="post">
@@ -260,7 +337,7 @@
                       @endif
                     @elseif($task->status === 'approved_resubmission')
                       <!-- Approved Resubmission -->
-                      <div class="space-y-2 ">
+                      <div class="space-y-2">
                         <div class="flex items-center text-green-300 text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -300,7 +377,7 @@
                     
                     @hasrole('admin')
                     <!-- More Dropdown -->
-                      <div class="hs-dropdown [--strategy:absolute]  relative inline-flex">
+                      <div class="hs-dropdown [--strategy:absolute] relative inline-flex">
                         <button id="hs-pro-ainmd" type="button" class="flex justify-center items-center gap-x-3 size-9 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:hover:text-neutral-200 dark:focus:text-neutral-200">
                           <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
@@ -478,7 +555,7 @@
                     </h4>
 
                     @if($task->taskProductivities->count()) 
-                    <div x-data="{ openRejectModalId: null }" class="space-y-4">
+                    <div class="space-y-4">
                         @foreach ($task->taskProductivities as $submission)
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
                             <div class="flex items-start justify-between">
@@ -569,19 +646,18 @@
                                                 </button>
                                             </form>
                                             
-                                            <button type="button" 
-                                                    class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-red-500/25"
-                                                    @click="openRejectModalId = {{ $submission->id }}">
+                                            <a href="{{ route('submissions.reject-form', $submission->id) }}" 
+                                                class="inline-flex items-center px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-red-500/25"
                                                 <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                                 Reject
-                                            </button>
+                                            </a>
                                         @endif
                                     @endhasanyrole
                                     
                                     @if($submission->status === 'rejected')
-                                        <a href="{{ route('submissions.resubmit', $submission->id) }}" 
+                                        <a href="{{ route('submissions.resubmit-form', [$task->slug, $submission->id]) }}" 
                                           class="inline-flex items-center px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-yellow-500/25">
                                             <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -589,68 +665,6 @@
                                             Resubmit
                                         </a>
                                     @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rejection Modal -->
-                        <div x-show="openRejectModalId === {{ $submission->id }}" 
-                            x-transition:enter="ease-out duration-300"
-                            x-transition:enter-start="opacity-0"
-                            x-transition:enter-end="opacity-100"
-                            x-transition:leave="ease-in duration-200"
-                            x-transition:leave-start="opacity-100"
-                            x-transition:leave-end="opacity-0"
-                            class="fixed inset-0 z-50 overflow-y-auto" 
-                            x-cloak>
-                            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="openRejectModalId = null"></div>
-
-                                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-200 dark:border-gray-700">
-                                    <div class="px-6 py-5 sm:p-6">
-                                        <div class="flex items-center justify-between mb-5">
-                                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Reject Submission</h3>
-                                            <button @click="openRejectModalId = null" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <form method="POST" action="{{ route('submissions.reject', $submission->id) }}" class="space-y-4">
-                                            @csrf
-                                            <div>
-                                                <label for="remarks-{{ $submission->id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Remarks *</label>
-                                                <textarea 
-                                                    name="remarks" 
-                                                    id="remarks-{{ $submission->id }}" 
-                                                    rows="4" 
-                                                    required
-                                                    placeholder="Please provide specific feedback on why this submission is being rejected and what improvements are needed..."
-                                                    class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition resize-none"
-                                                ></textarea>
-                                            </div>
-
-                                            <div class="flex justify-end space-x-3 pt-4">
-                                                <button 
-                                                    type="button" 
-                                                    @click="openRejectModalId = null" 
-                                                    class="px-5 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 transition-all duration-200 font-medium"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button 
-                                                    type="submit" 
-                                                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-all duration-200 font-medium flex items-center shadow-lg hover:shadow-red-500/25"
-                                                >
-                                                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                    Reject Submission
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -668,6 +682,7 @@
                 </div>
               </div>
             </div>
+            <!-- End Task Box -->
             @endforeach
           </div>
         @else
@@ -679,96 +694,22 @@
             <p class="mt-1 text-sm text-gray-500">Get started by creating your first task</p>
             @hasanyrole('admin|project-manager')
             <div class="mt-6">
-              <button 
-                @click="openTaskModal()" 
+              <a href="{{ route('tasks.add-task', [$goal->slug]) }}" 
+                type="button"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors duration-200"
+                data-hs-overlay="#hs-task-creation-modal"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
                 Add Task
-              </button>
+              </a>
             </div>
             @endhasanyrole
           </div>
         @endif
       </div>
     </div>
-
-    <!-- Task Creation Modal -->
-    <div 
-      x-show="showTaskModal" 
-      x-transition:enter="ease-out duration-300"
-      x-transition:enter-start="opacity-0"
-      x-transition:enter-end="opacity-100"
-      x-transition:leave="ease-in duration-200"
-      x-transition:leave-start="opacity-100"
-      x-transition:leave-end="opacity-0"
-      class="fixed inset-0 z-50 overflow-y-auto" 
-      x-cloak
-    >
-      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="closeTaskModal()"></div>
-
-        <!-- Modal panel -->
-        <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 class="text-lg leading-6 font-medium text-white mb-4">Create New Task</h3>
-            <form method="POST" action="{{ route('tasks.store', $goal->slug) }}" class="space-y-4">
-              @csrf
-              <div class="space-y-4">
-                <div>
-                  <label for="task-title" class="block text-sm font-medium text-gray-300 mb-1">Title</label>
-                  <input type="text" name="title" id="task-title" required class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                  <label for="task-description" class="block text-sm font-medium text-gray-300 mb-1">Description</label>
-                  <textarea name="description" id="task-description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label for="task-due-date" class="block text-sm font-medium text-gray-300 mb-1">Due Date</label>
-                    <input 
-                      type="date" 
-                      name="deadline" 
-                      id="task-due-date" 
-                      required
-                      class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      min="{{ now()->format('Y-m-d') }}"  
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="mt-6 flex justify-end space-x-3">
-                <button 
-                  type="button" 
-                  @click="closeTaskModal()" 
-                  class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md text-white transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white transition-colors duration-200"
-                >
-                  Create Task
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-  <!-- Modal -->
-  <script>
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.querySelectorAll('.hs-overlay').forEach((el) => HSOverlay.open(el));
-      });
-    });
-  </script>
+  
 </x-layout>

@@ -104,6 +104,7 @@
         </div>
       </div>
       
+      @hasrole('admin')
       <a href="{{ route('sdgs.create') }}" 
          class="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-700 dark:to-blue-800 dark:hover:from-blue-800 dark:hover:to-blue-900 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/30">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,6 +112,7 @@
         </svg>
         <span>Add New SDG</span>
       </a>
+      @endhasrole
     </div>
     
     <!-- Grid -->
