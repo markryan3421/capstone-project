@@ -31,6 +31,17 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function initializeCurrentSdg() {
+        // If the user has no current_sdg_id yet, assign the first one they have
+        if (!$this->current_sdg_id && $this->sdgs()->exists()) {
+            $firstSdg = $this->sdgs()->first();
+            $this->current_sdg_id = $firstSdg->id;
+            $this->save();
+        }
+
+        // Set the SDG ID into session
+        session(['sdg_id' => $this->current_sdg_id]);
+    }
     
 
     public function sdgs(): BelongsToMany

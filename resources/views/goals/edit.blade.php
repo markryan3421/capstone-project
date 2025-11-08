@@ -57,7 +57,7 @@
                 <label for="start_date" class="block text-sm font-medium mb-1">Start Date</label>
                 <input type="date" name="start_date" id="start_date"
                        class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                       value="{{ old('start_date', $goal->start_date) }}"
+                       value="{{ old('start_date', \Carbon\Carbon::parse($goal->start_date)->format('Y-m-d')) }}"
                         min="{{ now()->format('Y-m-d') }}" required>
             </div>
 
@@ -65,7 +65,7 @@
                 <label for="end_date" class="block text-sm font-medium mb-1">End Date</label>
                 <input type="date" name="end_date" id="end_date"
                        class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                       value="{{ old('end_date', $goal->end_date) }}" 
+                       value="{{ old('end_date', \Carbon\Carbon::parse($goal->end_date)->format('Y-m-d')) }}" 
                         min="{{ now()->format('Y-m-d') }}"  required>
             </div>
         </div>

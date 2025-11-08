@@ -15,7 +15,7 @@
                 <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-sm font-bold mr-3">
                   {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                 </div>
-                <span class="text-gray-200">{{ auth()->user()->name }}</span>
+                <span class="text-gray-200">{{ auth()->user()->name }}</span> (You)
               </div>
               <input type="hidden" name="project_manager_id" value="{{ $sdg->id }}">
           </div>

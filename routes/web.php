@@ -29,7 +29,6 @@ Route::middleware('auth')->group(function() {
 
 // Settings Related Routes
 Route::middleware('auth')->prefix('settings')->name('settings.')->group(function () {
-
   // Role Related Routes
   Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
   Route::get('/roles/add-role', [RoleController::class, 'create'])->name('roles.create-role');
