@@ -567,3 +567,31 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.7);
 }
+
+/* SDG index styles */
+/* Add these styles to your existing CSS */
+.sdq-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Smooth hover animations */
+.sdq-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optional: Add a subtle lift effect */
+.sdq-card:hover {
+  transform: translateY(-4px);
+}
+
+/* For the glass morphism effect */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+}
+
+/* Pattern background utility */
+.bg-pattern-dots {
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+  background-size: 16px 16px;
+}

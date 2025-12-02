@@ -25,7 +25,7 @@ class GoalController extends Controller
 
         return view('reports.non-compliance', compact('nonCompliantGoals'));
     }
-    
+
     public function complianceReport() {
         $compliantGoals = Goal::where('compliance_percentage', 100)
             ->with(['projectManager', 'assignedUsers', 'sdg'])
@@ -93,7 +93,7 @@ class GoalController extends Controller
      * Display the specified resource.
      */
     public function show(Goal $goal)
-    {   
+    {
         $user = Auth::user();
 
         // if(!$goal->assignedUsers->contains($user->id) || $user->hasRole('admin')) {
@@ -102,8 +102,8 @@ class GoalController extends Controller
 
         // Fetch the goal by ID and load its related project manager, assigned users, and SDG
         $goal->load([
-            'projectManager:id,name',
-            'assignedUsers:id,name,email',
+            'projectManager:id,name,avatar',
+            'assignedUsers:id,name,email,avatar',
             'sdg:id,name',
             'tasks.taskProductivities.user', // Load the user for each task's taskProductivity
         ]);

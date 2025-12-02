@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Goal extends Model
 {
-    use HasFactory, FilterBySdg, HasGoalNotifications, FilterGoalByStaff;
+    use HasFactory, FilterBySdg, HasGoalNotifications, FilterGoalByStaff; 
 
     protected $fillable = [
         'project_manager_id',
@@ -42,6 +42,28 @@ class Goal extends Model
         'end_date' => 'datetime',
         'compliance_percentage' => 'decimal:2',
     ];
+
+    public static function forStaff() {
+        $userId = Auth::id();
+        return static::whereHas('assignedUsers', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        });
+    }
+
+    public static function getGoalsFor(User $user) {
+        if($user->hasRole('admin')) {
+            return static::latest()->get();
+        }
+
+        if($user->hasRole('project-manager')) {
+            return static::where('project_manager_id', '=', $user->id)->latest()->get();
+        }
+
+        if($user->hasRole('staff')) {
+            return static::forStaff()->latest()->get();
+        }
+
+    }
 
     public static function updateGoalWithAssignments(array $data, Goal $goal, User $updater) {
         $goal = Goal::findOrFail($goal->id);

@@ -8,7 +8,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span class="font-medium tracking-tight text-lg">Go back to SDG Preview</span>
+                <span class="font-medium tracking-tight text-lg">Return to SDG Preview</span>
             </a>
         </div>
 

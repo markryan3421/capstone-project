@@ -13,6 +13,63 @@
     <style>
         [x-cloak] { display: none !important; }
     </style>
+    <style>
+        /* Sidebar scrollbar: hidden by default, visible on hover. Blended theme look. */
+        .sidebar-scroll {
+            overflow-y: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+            position: relative;
+        }
+
+        /* Hide webkit scrollbar by default */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+        }
+
+        /* When hovering the sidebar, reveal a thin, blended scrollbar */
+        aside:hover .sidebar-scroll {
+            -ms-overflow-style: auto;
+            scrollbar-width: thin;
+        }
+
+        aside:hover .sidebar-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        /* Track: subtle translucent layer that blends with background */
+        aside:hover .sidebar-scroll::-webkit-scrollbar-track {
+            background: linear-gradient(180deg, rgba(30,41,59,0.0), rgba(30,41,59,0.02));
+            border-radius: 10px;
+            margin: 4px 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+
+        /* Thumb: soft gradient using sidebar accent colors (indigo -> teal) with blur and rounded edges */
+        aside:hover .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(99,102,241,0.14), rgba(14,165,164,0.12));
+            border-radius: 10px;
+            border: 2px solid rgba(30,41,59,0.45); /* blend with sidebar */
+            background-clip: padding-box;
+            box-shadow: inset 0 1px 6px rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            transition: background-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+            opacity: 0.9;
+        }
+
+        /* Slightly stronger/thumb on hover for easier grabbing */
+        aside:hover .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(99,102,241,0.22), rgba(14,165,164,0.18));
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.55);
+            opacity: 1;
+        }
+
+        /* Firefox: use scrollbar-color to mimic the above; track uses transparent to blend */
+        aside:hover .sidebar-scroll {
+            scrollbar-color: rgba(99,102,241,0.18) rgba(30,41,59,0.02);
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans antialiased relative">
@@ -47,7 +104,7 @@
     <div class="flex relative z-10 min-h-screen">
         <!-- Sidebar -->
         <aside
-            class="fixed top-0 left-0 h-screen w-72 bg-gray-800/90 backdrop-blur-sm z-40 p-6 transition-all duration-300 ease-in-out will-change-transform border-r border-gray-700/50 shadow-xl"
+            class="fixed top-0 left-0 h-screen w-72 bg-gray-800/90 backdrop-blur-sm z-40 p-6 transition-all duration-300 ease-in-out will-change-transform border-r border-gray-700/50 shadow-xl flex flex-col"
             :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
             x-show="sidebarOpen"
             x-transition
@@ -80,7 +137,7 @@
             </div>
             
             <!-- Navigation Menu -->
-            <nav class="space-y-1.5">
+            <nav class="space-y-1.5 sidebar-scroll">
                 <a href="/" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-200 hover:bg-gray-700/50 hover:text-white transition group">
                     <div class="w-8 h-8 bg-gray-700/50 group-hover:bg-blue-600 rounded-lg flex items-center justify-center mr-3 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,12 +165,14 @@
                     </button>
 
                     <div x-show="goalsOpen" x-transition class="ml-12 mt-1 space-y-1.5">
-                        <a href="{{ route('goals.create') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-700/30 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Add New Goal
-                        </a>
+                        @hasanyrole(['admin', 'project-manager'])
+                            <a href="{{ route('goals.create') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-700/30 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add New Goal
+                            </a>
+                        @endhasanyrole
                         <a href="{{ route('goals.longterm') }}" class="flex items-center px-3 py-2 text-sm rounded-lg hover:bg-gray-700/30 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -135,7 +194,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
                         </svg>
                     </div>
-                    Phases
+                    Requirements
                 </a>
 
                 <!-- Reports Dropdown -->
@@ -171,7 +230,7 @@
                     </div>
                 </div>
 
-                @hasanyrole(['admin|project-manager'])
+                @hasrole(['admin'])
                     <a href="/settings/users" class="sidebar-link flex items-center px-4 py-3 rounded-lg text-gray-200 hover:bg-gray-700/50 hover:text-white transition group">
                         <div class="w-8 h-8 bg-gray-700/50 group-hover:bg-amber-600 rounded-lg flex items-center justify-center mr-3 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -180,7 +239,7 @@
                         </div>
                         Settings
                     </a>
-                @endhasanyrole
+                @endhasrole
 
                 <form action="/logout" method="POST" class="w-full mt-6 pt-4 border-t border-gray-700/50">
                     @csrf

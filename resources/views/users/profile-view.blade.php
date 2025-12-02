@@ -8,11 +8,11 @@
                     <!-- Header Section -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                         <div class="flex items-center">
-                            <a href="/" class="flex items-center text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <a href="/" class="flex items-center text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-md font-bold transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-3" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                                 </svg>
-                                Home
+                                Return to Dashboard
                             </a>
                         </div>
                         
@@ -20,13 +20,21 @@
                             User Profile
                         </h2>
                         
-                        <a href="/profile/{{ $user->user_slug }}/edit"
-                            class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-indigo-500/25">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit Profile
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <!-- Notification Sound Toggle -->
+                            <button id="enable-sounds" class="flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 border border-gray-200 dark:border-gray-600">
+                                <span class="sound-icon text-lg">🔔</span>
+                                <span class="sound-text text-sm">Enable Sounds</span>
+                            </button>
+
+                            <a href="/profile/{{ $user->user_slug }}/edit"
+                                class="inline-flex items-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-indigo-500/25">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit Profile
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Profile Overview -->
@@ -74,11 +82,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <button id="enable-sounds" class="sound-toggle-btn" aria-label="Toggle notification sounds">
-                        <span class="sound-icon">🔔</span>
-                        <span class="sound-text">Enable Sounds</span>
-                    </button>
 
                     <audio id="notification-sound" preload="auto" 
                         src="{{ asset('sounds/notification.mp3') }}">
@@ -198,9 +201,39 @@
         </div>
     </div>
 
+    <style>
+        .sound-toggle-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .sound-toggle-btn.enabled {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #059669;
+        }
+        
+        .sound-toggle-btn.enabled:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        
+        .sound-toggle-btn.error {
+            animation: shake 0.5s ease-in-out;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-color: #dc2626;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) translateY(-0.5px); }
+            25% { transform: translateX(-5px) translateY(-0.5px); }
+            75% { transform: translateX(5px) translateY(-0.5px); }
+        }
+    </style>
+
     <script>
         let notificationSound;
         let soundToggle;
+        
         // Initialize notification system
         document.addEventListener('DOMContentLoaded', function() {
             soundToggle = document.getElementById('enable-sounds');
@@ -229,27 +262,39 @@
             notificationSound.currentTime = 0;
             notificationSound.play()
                 .then(() => {
-                notificationSound.pause();
-                notificationSound.currentTime = 0;
+                    notificationSound.pause();
+                    notificationSound.currentTime = 0;
                 })
                 .catch(e => {
-                console.error("Audio blocked:", e);
-                localStorage.setItem('soundsEnabled', 'false');
-                updateButtonState();
-                showPermissionAlert();
+                    console.error("Audio blocked:", e);
+                    localStorage.setItem('soundsEnabled', 'false');
+                    updateButtonState();
+                    showPermissionAlert();
                 });
         }
 
         function updateButtonState() {
             const isEnabled = localStorage.getItem('soundsEnabled') === 'true';
-            soundToggle.querySelector('.sound-icon').textContent = isEnabled ? '🔊' : '🔔';
-            soundToggle.querySelector('.sound-text').textContent = isEnabled ? 'Disable Sounds' : 'Enable Sounds';
+            soundToggle.querySelector('.sound-icon').textContent = isEnabled ? '🔊' : '🔇';
+            soundToggle.querySelector('.sound-text').textContent = isEnabled ? 'Disable Notification Sounds' : 'Enable Notification Sounds';
             soundToggle.classList.toggle('enabled', isEnabled);
+            
+            // Update styles based on state
+            if (isEnabled) {
+                soundToggle.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-200');
+                soundToggle.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white');
+            } else {
+                soundToggle.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
+                soundToggle.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-200');
+            }
         }
 
         function showPermissionAlert() {
             soundToggle.classList.add('error');
-            setTimeout(() => soundToggle.classList.remove('error'), 1000);
+            setTimeout(() => {
+                soundToggle.classList.remove('error');
+                updateButtonState();
+            }, 1000);
         }
 
         // Global function - now can access notificationSound
@@ -261,19 +306,12 @@
                     console.error("Playback failed:", e);
                     // Don't disable sounds automatically - just show error
                     soundToggle.classList.add('error');
-                    setTimeout(() => soundToggle.classList.remove('error'), 1000);
+                    setTimeout(() => {
+                        soundToggle.classList.remove('error');
+                        updateButtonState();
+                    }, 1000);
                 });
             }
         };
-
-        function playNotificationSound() {
-            try {
-                const sound = new Audio("{{ asset('sounds/notification.mp3') }}");
-                sound.volume = 0.3; // 30% volume to avoid being annoying
-                sound.play().catch(e => console.log("Sound play prevented:", e));
-            } catch (e) {
-                console.warn("Couldn't play notification sound:", e);
-            }
-        }
     </script>
 </x-layout>

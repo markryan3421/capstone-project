@@ -41,28 +41,7 @@ class LoginController extends Controller
         }
 
         $user = Auth::user();
-        $role = $user->getRoleNames()->first();
-
-        switch($role) {
-            case 'admin':
-                // Admin: see all goals
-                $goals = Goal::latest()->get();
-                break;
-            case 'project-manager':
-                // Project Managers: see goals they manage
-                $goals = Goal::where('project_manager_id', $user->id) // keep this if PMs are linked in goals
-                    ->latest()
-                    ->get();
-                break;
-            case 'staff':
-                // Staff: see goals assigned to them (many-to-many)
-                $goals = Goal::forStaff() // uses the Trait created
-                    ->latest()
-                    ->get();
-                break;
-            default:
-                $goals = collect(); // empty if no role match
-            }
+        $goals = Goal::getGoalsFor(Auth::user());
 
         // Dashboard statistics
         $sdgs = Sdg::all();

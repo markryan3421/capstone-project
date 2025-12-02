@@ -11,6 +11,7 @@ use App\Models\TaskProductivity;
 use App\Models\ResubmissionRequest;
 use App\Traits\GoalProgressUpdater;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Notifications\TaskStatusNotification;
 use App\Notifications\ResubmissionRequestNotification;
 
@@ -262,13 +263,24 @@ class TaskProductivityController extends Controller
             'files.*' => 'file|mimes:doc,docx,pdf,xls,xlsx,ppt,pptx|max:20480',
         ]);
 
-        $updatedSubmission = TaskProductivity::updateOrCreate(
-            [
+        // Find existing productivity
+        $pastSubmissions = TaskProductivity::where('task_id', '=', $task->id)->first();
+
+        // If exists, delete that productivity
+        if($pastSubmissions) {
+            foreach($pastSubmissions->taskProductivityFiles as $file) {
+                // delete the files
+                Storage::disk('public')->delete($file->file_path);
+            }
+            // delete DB records
+            $pastSubmissions->taskProductivityFiles()->delete();
+            $pastSubmissions->delete();
+        }
+
+        $updatedSubmission = TaskProductivity::create([
                 'task_id' => $task->id,
                 'user_id' => Auth::id(),
                 'updated_at' => now()->toDateString(),
-            ],
-            [
                 'sdg_id' => $task->sdg_id,
                 'goal_id' => $task->goal_id,
                 'subject' => $incomingFields['subject'],
@@ -276,20 +288,19 @@ class TaskProductivityController extends Controller
                 'status' => 'pending',
                 'remarks' => 'Pending for review',
                 'date' => now()->toDateString(),
-            ]
-        );
+            ]);
 
+        // upload and save the new files
         foreach($incomingFields['files'] as $file) {
             $filePath = $file->store('task_productivities', 'public');
 
-            $updatedSubmission->taskProductivityFiles()->updateOrCreate([
+            $updatedSubmission->taskProductivityFiles()->create([
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
                 'file_type' => $file->getClientMimeType(),
                 'file_path' => $filePath,
             ]);
         }
-
 
         // Update goal progress after resubmission
         $this->updateGoalProgress($updatedSubmission->task->goal);

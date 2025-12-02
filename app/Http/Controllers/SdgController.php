@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sdg;
+use App\Models\Goal;
+use App\Models\Task;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,9 +30,11 @@ class SdgController extends Controller
     public function index() {
         // Get all SDGs for the authenticated user
         $sdgs = Auth::user()->sdgs;
+        $totalGoals = Goal::count();
+        $totalTasks = Task::count();
 
         // Return the view with the SDGs
-        return view('sdgs', compact('sdgs'));
+        return view('sdgs', compact('sdgs', 'totalGoals', 'totalTasks'));
     }
 
     public function create() {

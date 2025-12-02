@@ -1,3 +1,4 @@
+import "./libs/trix";
 // ✅ Core imports
 import './bootstrap'
 import Alpine from 'alpinejs'
@@ -25,3 +26,4 @@ import Settings from './settings'
 import './notification'
 import './particles'
 import './charts'
+import './highlight-task'

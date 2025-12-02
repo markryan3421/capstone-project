@@ -89,7 +89,7 @@ class TaskController extends Controller
             $user->notify(new TaskStatusNotification(
                 "{$sender->name} assigned you a new task for {$goal->title}.",
                 "Go check it out.",
-                route('goals.show', ['goal' => $goal->slug]),
+                route('goals.show', ['goal' => $goal->slug]) . "#task-{$task->slug}",
                 $goal->id,
                 $sender,
                 $goal

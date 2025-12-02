@@ -8,6 +8,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\FooterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\NotificationController;
@@ -16,6 +17,12 @@ use App\Http\Controllers\TaskProductivityController;
 Route::get('/', [LoginController::class, 'index']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
+
+// Footer Routes
+Route::get('/terms', [FooterController::class, 'terms'])->name('terms');
+Route::get('/privacy', [FooterController::class, 'privacy'])->name('privacy');
+Route::get('/contact', [FooterController::class, 'contact'])->name('contact');
+Route::get('/about', [FooterController::class, 'about'])->name('about');
 
 // SDG Related Routes
 Route::middleware('auth')->group(function() {
@@ -48,7 +55,6 @@ Route::middleware('auth')->prefix('settings')->name('settings.')->group(function
   Route::put('/users/{user:user_slug}/assign-role', [UserController::class, 'assignRole']);
   Route::delete('/users/{user:user_slug}/delete', [UserController::class, 'destroy']);
 
-  Route::get('/others', [SettingsController::class, 'index'])->name('others.index');
 });
 
 // Change / Switch Tenant
